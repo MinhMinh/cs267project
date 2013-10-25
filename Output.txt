@@ -1,0 +1,41 @@
+21.10.13 08:46:16 :	Table T2 was created.
+21.10.13 08:46:16 :	One line was saved to the table. T2: 0 -              2 
+21.10.13 08:55:37 :	DBMS ERROR:  Invalid DROP TABLE statement. 'DROP TABLE T2'.
+21.10.13 08:56:02 :	Table T2 does not exist.
+21.10.13 15:01:33 :	Table T2 was created.
+21.10.13 15:01:48 :	DBMS ERROR:  Table T2already exists. 'CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+21.10.13 15:02:26 :	DBMS ERROR:  Table T2already exists. 'CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+21.10.13 15:31:11 :	Table T1NameAge was dropped.
+21.10.13 15:41:34 :	Table T1NameAge was dropped.
+21.10.13 15:44:23 :	Table T1NameAge was dropped.
+21.10.13 15:44:56 :	Table T1NameAge was dropped.
+21.10.13 15:54:27 :	Table T1NameAge was dropped.
+21.10.13 16:11:53 :	Table NameAge does not exist.
+21.10.13 16:13:50 :	DBMS ERROR:  Invalid table file format.
+21.10.13 16:15:07 :	DBMS ERROR:  Invalid table file format.
+21.10.13 16:17:13 :	DBMS ERROR:  Invalid table file format.
+21.10.13 16:23:41 :	DBMS ERROR:  Invalid table file format.
+21.10.13 16:24:34 :	DBMS ERROR:  Invalid table file format.
+21.10.13 16:33:45 :	Index NameAge does not exist.
+21.10.13 16:35:53 :	Index NameAge does not exist.
+21.10.13 16:41:42 :	Index NameAge was dropped.
+21.10.13 16:42:43 :	Index NameAge was dropped.
+21.10.13 16:44:32 :	Table T2 was created.
+21.10.13 16:44:32 :	One line was saved to the table. T2: 0 -              2 
+21.10.13 16:44:32 :	DBMS ERROR:  A NOT NULL column cannot have null. 'INSERT INTO T2 VALUES ( 2 , - );'.
+21.10.13 16:45:10 :	Table T2 was created.
+21.10.13 16:45:10 :	One line was saved to the table. T2: 0 -              2 
+21.10.13 16:45:10 :	DBMS ERROR:  Invalid statement. '--INSERT INTO T2 VALUES ( 2 , - );'.
+21.10.13 16:45:34 :	Table T2 was created.
+21.10.13 16:45:34 :	One line was saved to the table. T2: 0 -              2 
+21.10.13 16:49:48 :	DBMS ERROR:  Table T2already exists. 'CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+21.10.13 16:50:08 :	DBMS ERROR:  Table T2 already exists. 'CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+24.10.13 17:16:28 :	DBMS ERROR:  Table T2 already exists. 'CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+24.10.13 17:18:19 :	DBMS ERROR:  Table T2 already exists. 'CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+24.10.13 17:18:38 :	DBMS ERROR:  Invalid statement. '--CREATE TABLE T2 ( HELLO CHAR ( 5 ) , GOODBYE INT NOT NULL ) ;'.
+24.10.13 17:25:36 :	DBMS ERROR:  Invalid table file format.
+24.10.13 17:33:55 :	DBMS ERROR:  Invalid table file format.
+24.10.13 17:34:24 :	DBMS ERROR:  Invalid table file format.
+24.10.13 17:35:16 :	DBMS ERROR:  Invalid table file format.
+24.10.13 17:36:01 :	DBMS ERROR:  Invalid table file format.
+24.10.13 17:37:44 :	Table T1 does not have column AGEASDA
