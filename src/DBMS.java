@@ -2,6 +2,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -9,6 +10,7 @@ import java.util.StringTokenizer;
 /**
  * CS 267 - Project - Implements create index, drop index, list table, and
  * exploit the index in select statements.
+ * Author: Minh H Dang
  */
 public class DBMS {
 	private static final String COMMAND_FILE_LOC = "Commands.txt";
@@ -54,7 +56,7 @@ public class DBMS {
 			// Load data to memory
 			db.loadTables();
 			
-			db.printDatabase();
+//			db.printDatabase();
 			
 			// Go through each line in the Command.txt file
 			while (in.hasNextLine()) {
@@ -109,10 +111,21 @@ public class DBMS {
 						}
 					} else if (command.equalsIgnoreCase("RUNSTATS")) {
 						// TODO your PART 1 code goes here
-
+						if (!tokenizer.hasMoreTokens()) {
+							throw new NoSuchElementException();
+						}
+						
+						String tableName = tokenizer.nextToken();
+						
+						String tok = tokenizer.nextToken();
+						if (!";".equalsIgnoreCase(tok)) {
+							throw new NoSuchElementException();
+						}
+						
+						db.doRunstats(tableName);
 						// TODO replace the table name below with the table name
 						// in the command to print the RUNSTATS output
-						db.printRunstats("T1");
+						db.printRunstats(tableName);
 					} else if (command.equalsIgnoreCase("SELECT")) {
 						// TODO your PART 2 code goes here
 					} else if (command.equalsIgnoreCase("--")) {
@@ -753,8 +766,6 @@ public class DBMS {
 	}
 	
 	private void createIndex(String sql, StringTokenizer tokenizer, boolean isUnique) throws Exception {
-		System.out.println("Trying to CREATE INDEX ... ");
-		
 		try {
 			//get index name
 			String idxName = tokenizer.nextToken();
@@ -785,6 +796,12 @@ public class DBMS {
 			if (onTable == null) {
 				out.println("Table " + tableName + " does not exist in the database.");
 				return ;
+			} else { //check if index does not exist in the table
+				for (Index idx : onTable.getIndexes()) 
+					if (idx.getIdxName().equalsIgnoreCase(idxName)) {
+						out.println("Index " + idxName + " already exist in the table " + tableName);
+						return ;
+					}				
 			}
 			
 			//Check for '(' 
@@ -847,9 +864,42 @@ public class DBMS {
 				throw new NoSuchElementException();
 			}
 			
-			System.out.println("Definition DONE --> Making Sort for value");
-			onTable.addIndex(index);
+			int[] colId = new int[index.getIdxKey().size()];
+			int[] desc = new int[index.getIdxKey().size()];
+			for (int i = 0; i < colId.length; i++) {
+				colId[i] = index.getIdxKey().get(i).colId;
+				desc[i] = index.getIdxKey().get(i).descOrder ? -1 : 1;
+			}
 			
+			ArrayList<Row> rows = new ArrayList<Row>();
+			for (int i = 0; i < onTable.getData().size(); i++) {
+				Row row = new Row();
+				
+				String s = onTable.getData().get(i).trim(); 
+				int t = s.indexOf(" ");
+				
+				String[] data = s.split(" ");
+				
+				for (int j = 0; j < colId.length; j++)
+					row.addData(data[0], data[colId[j]], desc[j]);
+				
+				rows.add(row);
+				rows.add(row);
+				rows.add(row);
+			}
+			
+			Collections.sort(rows);
+			
+			for (int i = 0; i < rows.size(); i++) {
+				Index.IndexKeyVal key = index.new IndexKeyVal();
+				
+				key.rid = Integer.parseInt(rows.get(i).getRowId());
+				key.value = rows.get(i).getData();
+				
+				index.addKey(key);
+			}
+			
+			onTable.addIndex(index);		
 			
 		} catch (NoSuchElementException ex) {
 			throw new DbmsError("Invalid CREATE INDEX statement. '" + sql + "'.");			
@@ -857,7 +907,7 @@ public class DBMS {
 	}
 	
 	private void dropIndex(String sql, StringTokenizer tokenizer) throws Exception {
-		System.out.println("Trying to DROP INDEX ... ");
+//		System.out.println("Trying to DROP INDEX ... ");
 		
 		try {
 			//get index name
@@ -901,5 +951,20 @@ public class DBMS {
 		} catch (NoSuchElementException ex) {
 			throw new DbmsError("Invalid DROP INDEX statement. '" + sql + "'.");			
 		}
+	}
+	
+	private void doRunstats(String tableName) {
+		Table table = null;
+		for (Table t : tables)
+			if (tableName.equalsIgnoreCase(t.getTableName())) {
+				table = t;
+				break;
+			}
+		
+		if (table == null) {
+			out.println("Table " + tableName + " does not exist in the database");
+		}
+		
+		
 	}
 }

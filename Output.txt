@@ -39,3 +39,12 @@
 24.10.13 17:35:16 :	DBMS ERROR:  Invalid table file format.
 24.10.13 17:36:01 :	DBMS ERROR:  Invalid table file format.
 24.10.13 17:37:44 :	Table T1 does not have column AGEASDA
+25.10.13 16:02:38 :	DBMS ERROR:  Invalid table file format.
+25.10.13 16:10:46 :	DBMS ERROR:  Invalid CREATE INDEX statement. 'CREATE INDEX X3 ON T1 ( AGE DESC , Name DESC) ;'.
+25.10.13 16:16:56 :	Index X2 already exist in the table T1
+25.10.13 16:16:56 :	Index X3 already exist in the table T1
+25.10.13 16:17:15 :	Index X2 already exist in the table T1
+25.10.13 16:17:15 :	Index X3 already exist in the table T1
+25.10.13 16:18:14 :	Index X2 already exist in the table T1
+25.10.13 16:18:14 :	Index X3 already exist in the table T1
+25.10.13 16:19:14 :	DBMS ERROR:  Invalid table file format.

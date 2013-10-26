@@ -12,7 +12,7 @@ public class Table {
 	private ArrayList<Column> columns;
 	private ArrayList<Index> indexes;
 	private ArrayList<String> data;
-
+	
 	public boolean delete = false;
 
 	public Table(String tableName) {
@@ -82,4 +82,5 @@ public class Table {
 	public void addData(String values) {
 		data.add(values);
 	}
+	
 }
