@@ -1,6 +1,12 @@
-2
-HELLO C5 true
-GOODBYE I false
+3
+Name C8 true
+Age I true
+Relation C10 true
 0
-1
-0 -              2 
+6
+  0 John             31 brother    
+  1 Jane              5 sister     
+  2 Jenny            35 daughter   
+  3 Joe              35 father     
+  4 Joan             35 mother     
+  5 Jake             35 son        

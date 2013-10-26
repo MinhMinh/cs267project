@@ -56,8 +56,6 @@ public class DBMS {
 			// Load data to memory
 			db.loadTables();
 			
-//			db.printDatabase();
-			
 			// Go through each line in the Command.txt file
 			while (in.hasNextLine()) {
 				String sql = in.nextLine();
@@ -180,20 +178,6 @@ public class DBMS {
 		}
 	}
 	
-	private void printDatabase() {
-		System.out.println("# tables: " + tables.size());
-		for (Table table : tables) {
-			System.out.println("Table name: " + table.getTableName());
-			System.out.println("Rows * Columns: " +  table.getData().size() + " * " + table.getNumColumns());
-			System.out.println("# indexes: " + table.getNumIndexes());
-			for (Index index : table.getIndexes()) 
-				System.out.println("   " + index.getIdxName());
-			System.out.println();
-		}
-		
-		System.out.println();
-	}
-	
 	/**
 	 * Loads tables to memory
 	 * 
@@ -234,7 +218,7 @@ public class DBMS {
 								break;
 							case 'I':
 								table.addColumn(new Column(i + 1, name,
-										Column.ColType.INT, 4, nullable));
+										Column.ColType.INT, 10, nullable));
 								break;
 							default:
 								break;
@@ -279,6 +263,7 @@ public class DBMS {
 						int numRows = Integer.parseInt(in.nextLine());
 						for (int i = 0; i < numRows; i++) {
 							table.addData(in.nextLine());
+//							System.out.println(i);
 						}
 					} catch (Exception ex) {
 						throw new DbmsError("Invalid table file format.");
@@ -309,8 +294,8 @@ public class DBMS {
 			while (in.hasNext()) {
 				String line = in.nextLine();
 				Index.IndexKeyVal val = index.new IndexKeyVal();
-				val.rid = Integer.parseInt(line.substring(0,
-						line.indexOf("'") - 1));
+				val.rid = Integer.parseInt(new StringTokenizer(line)
+						.nextToken());
 				val.value = line.substring(line.indexOf("'") + 1,
 						line.lastIndexOf("'"));
 				index.addKey(val);
@@ -318,7 +303,7 @@ public class DBMS {
 			in.close();
 		} catch (Exception ex) {
 			throw new DbmsError("Invalid index file format.");
-		} 
+		}
 	}
 
 	/**
@@ -357,7 +342,7 @@ public class DBMS {
 					while (!done) {
 						tok = tokenizer.nextToken();
 						if (Character.isAlphabetic(tok.charAt(0))) {
-							String colName = tok.toUpperCase();
+							String colName = tok;
 							Column.ColType colType = Column.ColType.INT;
 							int colLength = 4;
 							boolean nullable = true;
@@ -534,7 +519,9 @@ public class DBMS {
 					tok = tokenizer.nextToken();
 					if (tok.equalsIgnoreCase("(")) {
 						tok = tokenizer.nextToken();
-						String values = table.getData().size() + " ";
+						String values = String.format("%3s", table.getData()
+								.size())
+								+ " ";
 						int colId = 0;
 						boolean done = false;
 						while (!done) {
@@ -551,8 +538,7 @@ public class DBMS {
 
 								Column col = table.getColumns().get(colId);
 
-								if (tok.equals("-")
-										&& !col.isColNullable()) {
+								if (tok.equals("-") && !col.isColNullable()) {
 									throw new DbmsError(
 											"A NOT NULL column cannot have null. '"
 													+ sql + "'.");
@@ -576,8 +562,9 @@ public class DBMS {
 														+ sql + "'.");
 									}
 
-									tok = String
-											.format("%-" + col.getColLength() + "s", tok.trim());
+									tok = String.format(
+											"%-" + col.getColLength() + "s",
+											tok.trim());
 								}
 
 								values += tok + " ";
@@ -604,7 +591,8 @@ public class DBMS {
 
 						// insert the value to table
 						table.addData(values);
-						out.println("One line was saved to the table. " + table.getTableName() + ": " + values);
+						out.println("One line was saved to the table. "
+								+ table.getTableName() + ": " + values);
 					} else {
 						throw new NoSuchElementException();
 					}
@@ -655,7 +643,7 @@ public class DBMS {
 				}
 			}
 
-			if (! dropped) {
+			if (dropped) {
 				out.println("Table " + tableName + " does not exist.");
 			} else {
 				out.println("Table " + tableName + " was dropped.");
@@ -681,8 +669,7 @@ public class DBMS {
 		}
 	}
 
-	private void storeTableFile(Table table)
-			throws FileNotFoundException {
+	private void storeTableFile(Table table) throws FileNotFoundException {
 		File tableFile = new File(TABLE_FOLDER_NAME, table.getTableName()
 				+ TABLE_FILE_EXT);
 
@@ -738,30 +725,44 @@ public class DBMS {
 
 		// Save indexes to file
 		for (Index index : table.getIndexes()) {
-			PrintWriter out = new PrintWriter(new File(TABLE_FOLDER_NAME,
-					table.getTableName() + index.getIdxName() + INDEX_FILE_EXT));
-			String idxInfo = index.getIdxName() + " " + index.getIsUnique()
-					+ " ";
 
-			// Write index definition
-			for (Index.IndexKeyDef def : index.getIdxKey()) {
-				idxInfo += def.colId;
-				if (def.descOrder) {
-					idxInfo += "D ";
-				} else {
-					idxInfo += "A ";
+			File indexFile = new File(TABLE_FOLDER_NAME, table.getTableName()
+					+ index.getIdxName() + INDEX_FILE_EXT);
+
+			// Delete the file if it was marked for deletion
+			if (index.delete) {
+				try {
+					indexFile.delete();
+				} catch (Exception ex) {
+					out.println("Unable to delete index file for "
+							+ indexFile.getName() + ".");
 				}
-			}
-			out.println(idxInfo);
+			} else {
+				PrintWriter out = new PrintWriter(indexFile);
+				String idxInfo = index.getIdxName() + " " + index.getIsUnique()
+						+ " ";
 
-			// Write index keys
-			out.println(index.getKeys().size());
-			for (Index.IndexKeyVal key : index.getKeys()) {
-				out.println(key.rid + " '" + key.value + "'" );
-			}
+				// Write index definition
+				for (Index.IndexKeyDef def : index.getIdxKey()) {
+					idxInfo += def.colId;
+					if (def.descOrder) {
+						idxInfo += "D ";
+					} else {
+						idxInfo += "A ";
+					}
+				}
+				out.println(idxInfo);
 
-			out.flush();
-			out.close();
+				// Write index keys
+				out.println(index.getKeys().size());
+				for (Index.IndexKeyVal key : index.getKeys()) {
+					out.println(key.rid + " '" + key.value + "'");
+				}
+
+				out.flush();
+				out.close();
+
+			}
 		}
 	}
 	
@@ -875,16 +876,15 @@ public class DBMS {
 			for (int i = 0; i < onTable.getData().size(); i++) {
 				Row row = new Row();
 				
-				String s = onTable.getData().get(i).trim(); 
-				int t = s.indexOf(" ");
-				
-				String[] data = s.split(" ");
-				
+				ArrayList<String> r = onTable.getCellRow(i);
+				/*
+				for (int j = 0; j < r.size(); j++) {
+					System.out.println(r.get(j) + " " + r.get(j).length());
+				}
+				*/
 				for (int j = 0; j < colId.length; j++)
-					row.addData(data[0], data[colId[j]], desc[j]);
+					row.addData(r.get(0), r.get(colId[j]), desc[j]);
 				
-				rows.add(row);
-				rows.add(row);
 				rows.add(row);
 			}
 			
@@ -893,13 +893,14 @@ public class DBMS {
 			for (int i = 0; i < rows.size(); i++) {
 				Index.IndexKeyVal key = index.new IndexKeyVal();
 				
-				key.rid = Integer.parseInt(rows.get(i).getRowId());
+				key.rid = Integer.parseInt(rows.get(i).getRowId().trim());
 				key.value = rows.get(i).getData();
 				
 				index.addKey(key);
 			}
 			
-			onTable.addIndex(index);		
+			onTable.addIndex(index);
+			out.println("Index " + idxName + " on the table " + onTable.getTableName() + " was created.");
 			
 		} catch (NoSuchElementException ex) {
 			throw new DbmsError("Invalid CREATE INDEX statement. '" + sql + "'.");			

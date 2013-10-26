@@ -12,6 +12,7 @@ public class Table {
 	private ArrayList<Column> columns;
 	private ArrayList<Index> indexes;
 	private ArrayList<String> data;
+	private ArrayList<ArrayList<String>> cells;
 	
 	public boolean delete = false;
 
@@ -23,6 +24,7 @@ public class Table {
 		columns = new ArrayList<Column>();
 		indexes = new ArrayList<Index>();
 		data = new ArrayList<String>();
+		cells = new ArrayList<ArrayList<String>>();
 	}
 
 	public String getTableName() {
@@ -81,6 +83,37 @@ public class Table {
 
 	public void addData(String values) {
 		data.add(values);
+
+		int id = values.trim().indexOf(" ");
+		id = values.indexOf(values.trim().substring(id - 1, id + 1)) + 1;
+		
+		values = values.trim();
+		while (values.contains("  "))
+			values = values.replaceAll("  ", " ");
+		
+		String[] s = values.split(" ");
+		
+		ArrayList<String> c = new ArrayList<String>();
+		while (s[0].length() < id)
+			s[0] = " " + s[0];
+		c.add(s[0]);
+		for (int i = 1; i <= numColumns; i++) {
+			int k = columns.get(i - 1).getColLength();
+			
+			if (columns.get(i - 1).getColType() == Column.ColType.INT) {
+				while (s[i].length() < k)
+					s[i] = "0" + s[i];
+			} else {
+				while (s[i].length() < k)
+					s[i] = s[i] + " ";
+			}
+			c.add(s[i]);
+		}
+		
+		cells.add(c);
 	}
 	
+	public ArrayList<String> getCellRow(int index) {
+		return cells.get(index);
+	}
 }

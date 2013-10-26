@@ -3,13 +3,13 @@ Name C8 false
 Age I false
 Relation C10 true
 3
-X2 false 2D 1A 
-X3 false 2D 1D 
-X1 false 2A 1A 
+AgeName3 false 2D 1D 
+AgeName2 false 2A 1A 
+Name true 1A 
 6
-0 John             31 brother    
-1 Jane              8 sister     
-2 Jenny            35 daughter   
-3 Joe              35 father     
-4 Joan             35 mother     
-5 Jake             35 son    
+  0 John             31 brother    
+  1 Jane           3895 sister     
+  2 Jenny            35 daughter   
+  3 Joe              35 father     
+  4 Joan             35 mother     
+  5 Jake             35 son    

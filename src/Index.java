@@ -9,6 +9,8 @@ public class Index {
 	private ArrayList<IndexKeyDef> idxKey;
 	private boolean isUnique;
 	private ArrayList<IndexKeyVal> keys;
+	
+	public boolean delete = false;
 
 	public class IndexKeyDef {
 		public int idxColPos;

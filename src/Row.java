@@ -30,10 +30,10 @@ public class Row implements Comparable<Row> {
 	}
 
 	public String getData() {
-		String r = "";
-		for (int i = 0; i < data.size(); i++)
-			r += data.get(i) + " ";
-		return r.trim();
+		String r = data.get(0);
+		for (int i = 1; i < data.size(); i++)
+			r += " " + data.get(i);
+		return r;
 	}
 	
 	public String getRowId() {

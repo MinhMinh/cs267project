@@ -48,3 +48,58 @@
 25.10.13 16:18:14 :	Index X2 already exist in the table T1
 25.10.13 16:18:14 :	Index X3 already exist in the table T1
 25.10.13 16:19:14 :	DBMS ERROR:  Invalid table file format.
+26.10.13 00:21:35 :	DBMS ERROR:  Invalid table file format.
+26.10.13 00:22:10 :	Table T2 was created.
+26.10.13 00:22:10 :	One line was saved to the table. T2:   0 John             31 brother    
+26.10.13 00:22:10 :	One line was saved to the table. T2:   1 Jane              5 sister     
+26.10.13 00:22:10 :	One line was saved to the table. T2:   2 Jenny            35 daughter   
+26.10.13 00:22:10 :	One line was saved to the table. T2:   3 Joe              35 father     
+26.10.13 00:22:10 :	One line was saved to the table. T2:   4 Joan             35 mother     
+26.10.13 00:22:10 :	One line was saved to the table. T2:   5 Jake             35 son        
+26.10.13 00:29:02 :	Index Name on the table T1 was created.
+26.10.13 00:29:02 :	DBMS ERROR:  Table T2already exists. 'CREATE TABLE T2 ( Name CHAR ( 8 ) , Age INT , Relation CHAR ( 10 ) ) ;'.
+26.10.13 00:29:43 :	Index Name on the table T1 was created.
+26.10.13 00:29:43 :	Table T2 was created.
+26.10.13 00:29:43 :	One line was saved to the table. T2:   0 John             31 brother    
+26.10.13 00:29:43 :	One line was saved to the table. T2:   1 Jane              5 sister     
+26.10.13 00:29:43 :	One line was saved to the table. T2:   2 Jenny            35 daughter   
+26.10.13 00:29:43 :	One line was saved to the table. T2:   3 Joe              35 father     
+26.10.13 00:29:43 :	One line was saved to the table. T2:   4 Joan             35 mother     
+26.10.13 00:29:43 :	One line was saved to the table. T2:   5 Jake             35 son        
+26.10.13 01:12:07 :	DBMS ERROR:  Invalid table file format.
+26.10.13 01:13:10 :	DBMS ERROR:  Invalid table file format.
+26.10.13 01:16:11 :	DBMS ERROR:  Invalid table file format.
+26.10.13 01:17:59 :	Index Name on the table T1 was created.
+26.10.13 01:20:01 :	DBMS ERROR:  Invalid table file format.
+26.10.13 01:26:50 :	Index Name on the table T1 was created.
+26.10.13 01:28:35 :	Index Name already exist in the table T1
+26.10.13 01:28:43 :	Index Name already exist in the table T1
+26.10.13 01:30:50 :	Index Name already exist in the table T1
+26.10.13 01:32:07 :	Index Name already exist in the table T1
+26.10.13 01:33:02 :	Index Name on the table T1 was created.
+26.10.13 01:33:25 :	Index Name already exist in the table T1
+26.10.13 01:43:53 :	Index Name on the table T1 was created.
+26.10.13 01:51:56 :	JAVA ERROR:  For input string: "  5"
+26.10.13 01:52:57 :	Index Name on the table T1 was created.
+26.10.13 01:59:39 :	Index Name on the table T1 was created.
+26.10.13 02:02:01 :	Index Name on the table T1 was created.
+26.10.13 02:05:44 :	Index AgeName on the table T1 was created.
+26.10.13 02:07:26 :	Index AgeName2 on the table T1 was created.
+26.10.13 02:08:28 :	Index AgeName2 on the table T1 was created.
+26.10.13 02:08:28 :	Index AgeName on the table T1 was created.
+26.10.13 02:10:03 :	Index AgeName3 on the table T1 was created.
+26.10.13 02:12:12 :	Index AgeName3 on the table T1 was created.
+26.10.13 02:12:12 :	Index AgeName2 on the table T1 was created.
+26.10.13 02:12:12 :	Index AgeName on the table T1 was created.
+26.10.13 02:12:12 :	Index Name on the table T1 was created.
+26.10.13 02:16:59 :	Index AgeName3 on the table T1 was created.
+26.10.13 02:16:59 :	Index AgeName2 on the table T1 was created.
+26.10.13 02:16:59 :	Index AgeName on the table T1 was created.
+26.10.13 02:16:59 :	Index Name on the table T1 was created.
+26.10.13 02:23:11 :	DBMS ERROR:  Invalid table file format.
+26.10.13 02:23:17 :	Index AgeName3 on the table T1 was created.
+26.10.13 02:32:02 :	Index AgeName3 on the table T1 was created.
+26.10.13 02:32:02 :	Index AgeName2 on the table T1 was created.
+26.10.13 02:32:02 :	Index AgeName on the table T1 was created.
+26.10.13 02:32:35 :	Index Name on the table T1 was created.
+26.10.13 02:34:51 :	Index AgeName was dropped.
