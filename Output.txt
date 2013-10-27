@@ -137,3 +137,22 @@
 26.10.13 23:53:28 :	Index RelationAge on the table T1 was created.
 26.10.13 23:56:07 :	Index RelationAgeDESC on the table T1 was created.
 26.10.13 23:56:07 :	Index RelationAge on the table T1 was created.
+27.10.13 09:21:00 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 09:21:00 :	Index RelationAge already exist in the table T1
+27.10.13 09:22:04 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 09:22:04 :	Index RelationAge already exist in the table T1
+27.10.13 15:48:09 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 15:49:00 :	Index RelationAge on the table T1 was created.
+27.10.13 15:50:57 :	Index RelationAgeDESC already exist in the table T1
+27.10.13 15:50:57 :	Index RelationAge already exist in the table T1
+27.10.13 15:51:22 :	Index RelationAge on the table T1 was created.
+27.10.13 16:01:23 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 16:02:13 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 16:02:13 :	Index RelationAge on the table T1 was created.
+27.10.13 16:04:41 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 16:04:41 :	Index RelationAge on the table T1 was created.
+27.10.13 16:06:31 :	DBMS ERROR:  Invalid table file format.
+27.10.13 16:06:45 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 16:06:45 :	Index RelationAge on the table T1 was created.
+27.10.13 16:07:54 :	Index RelationAgeDESC on the table T1 was created.
+27.10.13 16:07:54 :	Index RelationAge on the table T1 was created.

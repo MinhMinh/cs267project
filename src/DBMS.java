@@ -884,7 +884,7 @@ public class DBMS {
 			}
 			
 			Collections.sort(rows);
-			
+						
 			for (int i = 0; i < rows.size(); i++) {
 				Index.IndexKeyVal key = index.new IndexKeyVal();
 				
@@ -958,6 +958,7 @@ public class DBMS {
 		if (table == null) {
 			out.println("Table " + tableName + " does not exist in the database");
 		}
+		
 		
 		
 	}

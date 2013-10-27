@@ -24,6 +24,12 @@ public class Row implements Comparable<Row> {
 		for (int i = 0; i < n; i++) {
 			int d = this.data.get(i).compareToIgnoreCase(other.data.get(i));
 			if (d != 0) {
+				if (this.data.get(i).charAt(0) == (char) 255) {
+					return 1;
+				}
+				if (other.data.get(i).charAt(0) == (char) 255) {
+					return -1;
+				}
 				return d * increasing.get(i);
 			}
 		}
