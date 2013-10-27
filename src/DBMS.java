@@ -877,11 +877,6 @@ public class DBMS {
 				Row row = new Row();
 				
 				ArrayList<String> r = onTable.getCellRow(i);
-				/*
-				for (int j = 0; j < r.size(); j++) {
-					System.out.println(r.get(j) + " " + r.get(j).length());
-				}
-				*/
 				for (int j = 0; j < colId.length; j++)
 					row.addData(r.get(0), r.get(colId[j]), desc[j]);
 				
@@ -908,8 +903,6 @@ public class DBMS {
 	}
 	
 	private void dropIndex(String sql, StringTokenizer tokenizer) throws Exception {
-//		System.out.println("Trying to DROP INDEX ... ");
-		
 		try {
 			//get index name
 			String idxName = tokenizer.nextToken();

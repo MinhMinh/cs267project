@@ -1,4 +1,6 @@
-DROP INDEX AgeName ; 
+CREATE INDEX RelationAgeDESC On T1 ( Relation DESC , Age DESC ) ;
+CREATE INDEX RelationAge On T1 ( Relation , Age ) ;
+-- DROP INDEX AgeName ; 
 -- CREATE INDEX AgeName3 ON T1 ( Age DESC , Name DESC ) ;
 -- CREATE INDEX AgeName2 ON T1 ( Age , Name ) ;
 -- CREATE UNIQUE INDEX AgeName ON T1 ( Age DESC , Name ) ;

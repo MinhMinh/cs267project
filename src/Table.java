@@ -13,6 +13,7 @@ public class Table {
 	private ArrayList<Index> indexes;
 	private ArrayList<String> data;
 	private ArrayList<ArrayList<String>> cells;
+	private int dataLength;
 	
 	public boolean delete = false;
 
@@ -25,6 +26,7 @@ public class Table {
 		indexes = new ArrayList<Index>();
 		data = new ArrayList<String>();
 		cells = new ArrayList<ArrayList<String>>();
+		dataLength = 0;
 	}
 
 	public String getTableName() {
@@ -66,6 +68,7 @@ public class Table {
 	public void addColumn(Column column) {
 		columns.add(column);
 		numColumns++;
+		dataLength += column.getColLength();
 	}
 
 	public ArrayList<Index> getIndexes() {
@@ -84,30 +87,30 @@ public class Table {
 	public void addData(String values) {
 		data.add(values);
 
+		/*
+		 *  Parse string data to ArrayList<String> 
+		 */
 		int id = values.trim().indexOf(" ");
 		id = values.indexOf(values.trim().substring(id - 1, id + 1)) + 1;
 		
-		values = values.trim();
-		while (values.contains("  "))
-			values = values.replaceAll("  ", " ");
-		
-		String[] s = values.split(" ");
+		while (values.length() <= dataLength + id + numColumns)
+			values += " ";
 		
 		ArrayList<String> c = new ArrayList<String>();
-		while (s[0].length() < id)
-			s[0] = " " + s[0];
-		c.add(s[0]);
+		c.add(values.substring(0, id));
+		
 		for (int i = 1; i <= numColumns; i++) {
 			int k = columns.get(i - 1).getColLength();
+			String s = values.substring(id + 1, id + 1 + k);
+			id = id + k + 1;
+
+			if (isNull(s)) {
+				s = s.replaceAll(" ", "" + (char) 255);
+			} else if (columns.get(i - 1).getColType() == Column.ColType.INT) {
+				s  = s.replaceAll(" ", "0");
+			} 
 			
-			if (columns.get(i - 1).getColType() == Column.ColType.INT) {
-				while (s[i].length() < k)
-					s[i] = "0" + s[i];
-			} else {
-				while (s[i].length() < k)
-					s[i] = s[i] + " ";
-			}
-			c.add(s[i]);
+			c.add(s);
 		}
 		
 		cells.add(c);
@@ -115,5 +118,12 @@ public class Table {
 	
 	public ArrayList<String> getCellRow(int index) {
 		return cells.get(index);
+	}
+	
+	private boolean isNull(String s) {
+		for (int i = 0; i < s.length(); i++)
+			if (s.charAt(i) != ' ')
+				return false;
+		return true;
 	}
 }

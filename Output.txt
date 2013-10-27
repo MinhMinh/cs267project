@@ -103,3 +103,37 @@
 26.10.13 02:32:02 :	Index AgeName on the table T1 was created.
 26.10.13 02:32:35 :	Index Name on the table T1 was created.
 26.10.13 02:34:51 :	Index AgeName was dropped.
+26.10.13 11:29:03 :	DBMS ERROR:  Invalid table file format.
+26.10.13 21:03:06 :	JAVA ERROR:  Index: 0, Size: 0
+26.10.13 21:14:57 :	DBMS ERROR:  Invalid table file format.
+26.10.13 21:38:23 :	Index RelationAge on the table T1 was created.
+26.10.13 21:39:32 :	Index RelationAge on the table T1 was created.
+26.10.13 22:17:43 :	Index AgeName3 on the table T1 was created.
+26.10.13 22:23:19 :	Index AgeName3 on the table T1 was created.
+26.10.13 22:24:44 :	Index AgeName3 on the table T1 was created.
+26.10.13 22:27:46 :	Index AgeName3 on the table T1 was created.
+26.10.13 22:39:03 :	Index RelationAge on the table T1 was created.
+26.10.13 22:41:16 :	Index RelationAge already exist in the table T1
+26.10.13 22:41:36 :	DBMS ERROR:  Invalid CREATE INDEX statement. 'CREATE INDEX RelationAgeDESC On T1 ( Relation DESC, Age DESC ) ;'.
+26.10.13 22:41:53 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:12:20 :	Index RelationAgeDESC already exist in the table T1
+26.10.13 23:12:35 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:14:36 :	Index RelationAgeDESC already exist in the table T1
+26.10.13 23:14:46 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:18:04 :	Index RelationAgeDESC already exist in the table T1
+26.10.13 23:18:32 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:20:33 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:21:13 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:21:47 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:21:47 :	Index RelationAge on the table T1 was created.
+26.10.13 23:22:20 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:22:20 :	Index RelationAge on the table T1 was created.
+26.10.13 23:27:19 :	Index RelationAgeDESC already exist in the table T1
+26.10.13 23:27:19 :	Index RelationAge already exist in the table T1
+26.10.13 23:46:16 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:51:50 :	Index RelationAgeDESC already exist in the table T1
+26.10.13 23:52:32 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:53:28 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:53:28 :	Index RelationAge on the table T1 was created.
+26.10.13 23:56:07 :	Index RelationAgeDESC on the table T1 was created.
+26.10.13 23:56:07 :	Index RelationAge on the table T1 was created.
