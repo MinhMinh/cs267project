@@ -116,11 +116,15 @@ public class Table {
 		cells.add(c);
 	}
 	
-	public ArrayList<String> getCellRow(int index) {
+	public ArrayList<String> getRow(int index) {
 		return cells.get(index);
 	}
 	
-	private boolean isNull(String s) {
+	public String getCell(int indexRow, int indexCol) {
+		return cells.get(indexRow).get(indexCol);
+	}
+	
+	public boolean isNull(String s) {
 		for (int i = 0; i < s.length(); i++)
 			if (s.charAt(i) != ' ')
 				return false;

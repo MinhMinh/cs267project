@@ -1,5 +1,5 @@
-CREATE INDEX RelationAgeDESC On T1 ( Relation DESC , Age DESC ) ;
-CREATE INDEX RelationAge On T1 ( Relation , Age ) ;
+-- CREATE INDEX RelationAgeDESC On T1 ( Relation DESC , Age DESC ) ;
+-- CREATE INDEX RelationAge On T1 ( Relation , Age ) ;
 -- DROP INDEX AgeName ; 
 -- CREATE INDEX AgeName3 ON T1 ( Age DESC , Name DESC ) ;
 -- CREATE INDEX AgeName2 ON T1 ( Age , Name ) ;
@@ -12,3 +12,5 @@ CREATE INDEX RelationAge On T1 ( Relation , Age ) ;
 -- INSERT INTO T2 VALUES ( Joe , 35 , father ) ;
 -- INSERT INTO T2 VALUES ( Joan , 35 , mother ) ;
 -- INSERT INTO T2 VALUES ( Jake , 35 , son ) ;
+RUNSTATS T1 ;
+-- RUNSTATS T2 ;

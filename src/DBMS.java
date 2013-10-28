@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -876,7 +877,7 @@ public class DBMS {
 			for (int i = 0; i < onTable.getData().size(); i++) {
 				Row row = new Row();
 				
-				ArrayList<String> r = onTable.getCellRow(i);
+				ArrayList<String> r = onTable.getRow(i);
 				for (int j = 0; j < colId.length; j++)
 					row.addData(r.get(0), r.get(colId[j]), desc[j]);
 				
@@ -959,7 +960,37 @@ public class DBMS {
 			out.println("Table " + tableName + " does not exist in the database");
 		}
 		
-		
+		for (int j = 1; j <= table.getNumColumns(); j++) {
+			Column column = table.getColumns().get(j - 1);
+			String loKey = table.getCell(0, j);
+			String hiKey = table.getCell(0, j);
+			
+			HashMap<String, Integer> h = new HashMap<String, Integer>();
+			int d = 0;
+			h.put(table.getCell(0,  j), 1);
+			for (int i = 1; i < table.getData().size(); i++) {
+				String s = table.getCell(i, j);
+				
+				if (!h.containsKey(s)) {
+					h.put(s, 1);
+				}
+				if (s.charAt(0) == (char) 255) {
+					d = 1;
+					continue;
+				}
+				if (loKey.compareToIgnoreCase(s) > 0) {
+					loKey = s;
+				}
+				if (hiKey.compareToIgnoreCase(s) < 0) {
+					hiKey = s;
+				}
+				
+			}
+			
+			column.setLoKey(loKey);
+			column.setHiKey(hiKey);
+			column.setColCard(h.size() - d);
+		}
 		
 	}
 }
