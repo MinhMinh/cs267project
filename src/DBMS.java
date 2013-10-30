@@ -960,6 +960,7 @@ public class DBMS {
 			out.println("Table " + tableName + " does not exist in the database");
 		}
 		
+		table.setTableCard(table.getData().size());
 		for (int j = 1; j <= table.getNumColumns(); j++) {
 			Column column = table.getColumns().get(j - 1);
 			String loKey = table.getCell(0, j);
@@ -973,18 +974,19 @@ public class DBMS {
 				
 				if (!h.containsKey(s)) {
 					h.put(s, 1);
-				}
-				if (s.charAt(0) == (char) 255) {
+				} else continue;
+				
+				if (s.contains("-")) {
 					d = 1;
 					continue;
 				}
+				
 				if (loKey.compareToIgnoreCase(s) > 0) {
 					loKey = s;
 				}
 				if (hiKey.compareToIgnoreCase(s) < 0) {
 					hiKey = s;
 				}
-				
 			}
 			
 			column.setLoKey(loKey);

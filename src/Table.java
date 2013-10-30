@@ -105,7 +105,13 @@ public class Table {
 			id = id + k + 1;
 
 			if (isNull(s)) {
-				s = s.replaceAll(" ", "" + (char) 255);
+				if (columns.get(i - 1).getColType() == Column.ColType.INT) {
+					s = "         -";
+				} else {
+					s = "-";
+					while (s.length() < k)
+						s += " ";
+				}
 			} else if (columns.get(i - 1).getColType() == Column.ColType.INT) {
 				s  = s.replaceAll(" ", "0");
 			} 
@@ -125,9 +131,12 @@ public class Table {
 	}
 	
 	public boolean isNull(String s) {
+		/*
 		for (int i = 0; i < s.length(); i++)
 			if (s.charAt(i) != ' ')
 				return false;
 		return true;
+		*/
+		return s.contains("- ") || s.contains(" -");
 	}
 }
