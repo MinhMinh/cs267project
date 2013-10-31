@@ -10,8 +10,8 @@ RelationAgeDESC false 3D 2D
 RelationAge false 3A 2A 
 6
   0 John             31 brother    
-  1 Jane           3895      
+  1 Jane           3895 -     
   2 Jenny            35 daughter   
-  3 Joe              35           
+  3 Joe              35 -          
   4 Joan             35 mother     
   5 Jake             35 son        

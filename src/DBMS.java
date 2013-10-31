@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
@@ -966,14 +966,14 @@ public class DBMS {
 			String loKey = table.getCell(0, j);
 			String hiKey = table.getCell(0, j);
 			
-			HashMap<String, Integer> h = new HashMap<String, Integer>();
+			HashSet<String> h = new HashSet<String>();
 			int d = 0;
-			h.put(table.getCell(0,  j), 1);
+			h.add(table.getCell(0,  j));
 			for (int i = 1; i < table.getData().size(); i++) {
 				String s = table.getCell(i, j);
 				
-				if (!h.containsKey(s)) {
-					h.put(s, 1);
+				if (!h.contains(s)) {
+					h.add(s);
 				} else continue;
 				
 				if (s.contains("-")) {
