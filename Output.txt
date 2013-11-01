@@ -353,3 +353,71 @@
 29.10.13 18:23:32 :		COLUMN CARDINALITY: 4
 29.10.13 18:23:32 :		COLUMN HIGH KEY: son       
 29.10.13 18:23:32 :		COLUMN LOW KEY: brother   
+30.10.13 17:18:00 :	TABLE CARDINALITY: 6
+30.10.13 17:18:00 :	Name
+30.10.13 17:18:00 :		COLUMN CARDINALITY: 6
+30.10.13 17:18:00 :		COLUMN HIGH KEY: John    
+30.10.13 17:18:00 :		COLUMN LOW KEY: Jake    
+30.10.13 17:18:00 :	Age
+30.10.13 17:18:00 :		COLUMN CARDINALITY: 3
+30.10.13 17:18:00 :		COLUMN HIGH KEY: 0000003895
+30.10.13 17:18:00 :		COLUMN LOW KEY: 0000000031
+30.10.13 17:18:00 :	Relation
+30.10.13 17:18:00 :		COLUMN CARDINALITY: 4
+30.10.13 17:18:00 :		COLUMN HIGH KEY: son       
+30.10.13 17:18:00 :		COLUMN LOW KEY: brother   
+30.10.13 17:18:00 :	TABLE CARDINALITY: 6
+30.10.13 17:18:00 :	Name
+30.10.13 17:18:00 :		COLUMN CARDINALITY: 6
+30.10.13 17:18:00 :		COLUMN HIGH KEY: John    
+30.10.13 17:18:00 :		COLUMN LOW KEY: Jake    
+30.10.13 17:18:00 :	Age
+30.10.13 17:18:00 :		COLUMN CARDINALITY: 3
+30.10.13 17:18:00 :		COLUMN HIGH KEY: 0000000035
+30.10.13 17:18:00 :		COLUMN LOW KEY: 0000000005
+30.10.13 17:18:00 :	Relation
+30.10.13 17:18:00 :		COLUMN CARDINALITY: 6
+30.10.13 17:18:00 :		COLUMN HIGH KEY: son       
+30.10.13 17:18:00 :		COLUMN LOW KEY: brother   
+30.10.13 17:18:13 :	TABLE CARDINALITY: 6
+30.10.13 17:18:13 :	Name
+30.10.13 17:18:13 :		COLUMN CARDINALITY: 6
+30.10.13 17:18:13 :		COLUMN HIGH KEY: John    
+30.10.13 17:18:13 :		COLUMN LOW KEY: Jake    
+30.10.13 17:18:13 :	Age
+30.10.13 17:18:13 :		COLUMN CARDINALITY: 3
+30.10.13 17:18:13 :		COLUMN HIGH KEY: 0000003895
+30.10.13 17:18:13 :		COLUMN LOW KEY: 0000000031
+30.10.13 17:18:13 :	Relation
+30.10.13 17:18:13 :		COLUMN CARDINALITY: 4
+30.10.13 17:18:13 :		COLUMN HIGH KEY: son       
+30.10.13 17:18:13 :		COLUMN LOW KEY: brother   
+31.10.13 16:42:12 :	DBMS ERROR:  Invalid table file format.
+31.10.13 16:42:37 :	Index IX1 on the table T3 was created.
+31.10.13 16:42:37 :	Index IX2 on the table T3 was created.
+31.10.13 17:05:52 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:11:11 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:12:55 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:13:53 :	Index NameAgeNull on the table T4 was created.
+31.10.13 17:13:53 :	Index NameAgeNullD1 on the table T4 was created.
+31.10.13 17:13:53 :	Index NameAgeNullD2 on the table T4 was created.
+31.10.13 17:13:53 :	Index NameAgeNullDESC on the table T4 was created.
+31.10.13 17:22:32 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:22:57 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:23:58 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:24:14 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:24:20 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:25:38 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:26:17 :	Index NameAgeNull on the table T4 was created.
+31.10.13 17:26:17 :	Index NameAgeNullD1 on the table T4 was created.
+31.10.13 17:26:17 :	Index NameAgeNullD2 on the table T4 was created.
+31.10.13 17:26:17 :	Index NameAgeNullDESC on the table T4 was created.
+31.10.13 17:33:40 :	DBMS ERROR:  Invalid table file format.
+31.10.13 17:34:19 :	Index NameAgeNull already exist in the table T4
+31.10.13 17:34:19 :	Index NameAgeNullD1 already exist in the table T4
+31.10.13 17:34:19 :	Index NameAgeNullD2 already exist in the table T4
+31.10.13 17:34:19 :	Index NameAgeNullDESC already exist in the table T4
+31.10.13 17:35:41 :	Index NameAgeNull already exist in the table T4
+31.10.13 17:35:41 :	Index NameAgeNullD1 already exist in the table T4
+31.10.13 17:35:41 :	Index NameAgeNullD2 already exist in the table T4
+31.10.13 17:35:41 :	Index NameAgeNullDESC already exist in the table T4

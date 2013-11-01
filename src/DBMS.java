@@ -191,17 +191,19 @@ public class DBMS {
 			for (File tableFile : tableDir.listFiles()) {
 				// For each file check if the file extension is ".tab"
 				String tableName = tableFile.getName();
+				
 				int periodLoc = tableName.lastIndexOf(".");
 				String tableFileExt = tableName.substring(tableName
 						.lastIndexOf(".") + 1);
 				if (tableFileExt.equalsIgnoreCase("tab")) {
+					System.out.println("Reading table: " + tableName);
 					// If it is a ".tab" file, create a table structure
 					Table table = new Table(tableName.substring(0, periodLoc));
 					Scanner in = new Scanner(tableFile);
 
 					try {
 						// Read the file to get Column definitions
-						int numCols = Integer.parseInt(in.nextLine());
+						int numCols = Integer.parseInt(in.nextLine().trim());
 
 						for (int i = 0; i < numCols; i++) {
 							StringTokenizer tokenizer = new StringTokenizer(
@@ -227,7 +229,7 @@ public class DBMS {
 						}
 
 						// Read the file for index definitions
-						int numIdx = Integer.parseInt(in.nextLine());
+						int numIdx = Integer.parseInt(in.nextLine().trim());
 						for (int i = 0; i < numIdx; i++) {
 							StringTokenizer tokenizer = new StringTokenizer(
 									in.nextLine());
@@ -261,7 +263,7 @@ public class DBMS {
 						}
 
 						// Read the data from the file
-						int numRows = Integer.parseInt(in.nextLine());
+						int numRows = Integer.parseInt(in.nextLine().trim());
 						for (int i = 0; i < numRows; i++) {
 							table.addData(in.nextLine());
 //							System.out.println(i);

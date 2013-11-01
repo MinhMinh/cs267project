@@ -12,5 +12,12 @@
 -- INSERT INTO T2 VALUES ( Joe , 35 , father ) ;
 -- INSERT INTO T2 VALUES ( Joan , 35 , mother ) ;
 -- INSERT INTO T2 VALUES ( Jake , 35 , son ) ;
-RUNSTATS T1 ;
+-- RUNSTATS T1 ;
 -- RUNSTATS T2 ;
+-- CREATE INDEX IX1 ON T3 ( NAME DESC ) ;
+-- CREATE INDEX IX2 ON T3 ( NAME DESC , AGE DESC , RELATION DESC ) ;
+CREATE INDEX NameAgeNull ON T4 ( Name , Age ) ;
+CREATE INDEX NameAgeNullD1 ON T4 ( Name DESC , Age  ) ;
+CREATE INDEX NameAgeNullD2 ON T4 ( Name  , Age  DESC ) ;
+CREATE INDEX NameAgeNullDESC ON T4 ( Name DESC , Age  DESC ) ;
+
