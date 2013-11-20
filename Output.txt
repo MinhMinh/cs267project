@@ -421,3 +421,5 @@
 31.10.13 17:35:41 :	Index NameAgeNullD1 already exist in the table T4
 31.10.13 17:35:41 :	Index NameAgeNullD2 already exist in the table T4
 31.10.13 17:35:41 :	Index NameAgeNullDESC already exist in the table T4
+19.11.13 15:46:52 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT SELECT T1.col3 FROM T1 ;'.
+19.11.13 15:47:44 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT SELECT T1.col3 FROM T1 ;'.

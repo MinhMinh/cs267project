@@ -23,6 +23,10 @@ public class DBMS {
 
 	private DbmsPrinter out;
 	private ArrayList<Table> tables;
+	private ArrayList<ColumnName> selectColumns;
+	private ArrayList<ColumnName> whereColumns;
+	private ArrayList<ColumnName> sortColumns;
+	private ArrayList<String> fromTables;
 
 	public DBMS() {
 		tables = new ArrayList<Table>();
@@ -127,6 +131,7 @@ public class DBMS {
 						db.printRunstats(tableName);
 					} else if (command.equalsIgnoreCase("SELECT")) {
 						// TODO your PART 2 code goes here
+						db.select(sql, tokenizer);
 					} else if (command.equalsIgnoreCase("--")) {
 						// Ignore this command as a comment
 					} else if (command.equalsIgnoreCase("COMMIT")) {
@@ -767,6 +772,94 @@ public class DBMS {
 
 			}
 		}
+	}
+
+	private void select(String sql, StringTokenizer tokenizer) throws Exception {
+		try {
+			selectColumns = new ArrayList<ColumnName>();
+			whereColumns = new ArrayList<ColumnName>();
+			sortColumns = new ArrayList<ColumnName>();
+			fromTables = new ArrayList<String>();
+			
+			boolean hasMore = true;
+			String token = tokenizer.nextToken();
+			while (hasMore) {
+				int id = token.indexOf(".");
+				if (id == -1) throw new NoSuchElementException();
+				
+				selectColumns.add(new ColumnName(token.substring(0, id), token.substring(id + 1)));
+
+				token = tokenizer.nextToken();
+				hasMore = ",".endsWith(token);
+			}
+			
+			//token == "WHERE"
+			token = tokenizer.nextToken();
+			hasMore = true;
+			while (hasMore) {
+				fromTables.add(token);
+				token = tokenizer.nextToken();
+				hasMore = ",".endsWith(token);
+			}
+			
+			if (token.equalsIgnoreCase("WHERE")) {
+				token = tokenizer.nextToken();
+				hasMore = true;
+				while (hasMore) {
+					Predicate p = new Predicate();
+					p.text += token; //Column name
+					
+					int id = token.indexOf(".");
+					if (id == -1) throw new NoSuchElementException();
+					p.left = new ColumnName(token.substring(0, id), token.substring(id + 1));
+					
+					token = tokenizer.nextToken(); //condition
+					switch (token) {
+					case "=": 
+						p.setType('E');
+						
+						break;
+					case "<":
+						p.setType('R');
+						break;
+					case ">":
+						p.setType('R');
+						break;
+					default: //IN condition
+						p.setType('I');
+						p.setInList(true);
+						break;
+					}
+					
+					
+					token = tokenizer.nextToken();
+					hasMore = ",".endsWith(token);
+				}			
+			} 
+			
+			if (token.equalsIgnoreCase("ORDER")) {
+				token = tokenizer.nextToken();
+				if (!token.equalsIgnoreCase("BY")) throw new NoSuchElementException();
+				
+				token = tokenizer.nextToken();
+				hasMore = true;
+				while (hasMore) {
+					int id = token.indexOf(".");
+					if (id == -1) throw new NoSuchElementException();
+					sortColumns.add(new ColumnName(token.substring(0, id), token.substring(id + 1)));
+					
+					token = tokenizer.nextToken(); //Don't care about 'A' or 'D'
+					if (token.equalsIgnoreCase("D"))
+						token = tokenizer.nextToken();
+					
+					hasMore = ",".endsWith(token);
+				}
+			}
+			
+			if (! ";".equals(token)) throw new NoSuchElementException();
+		} catch (NoSuchElementException ex) {
+			throw new DbmsError("Invalid SELECT statement. '" + sql + "'.");			
+		}	
 	}
 	
 	private void createIndex(String sql, StringTokenizer tokenizer, boolean isUnique) throws Exception {

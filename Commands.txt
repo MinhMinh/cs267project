@@ -1,3 +1,4 @@
+SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;
 -- CREATE INDEX RelationAgeDESC On T1 ( Relation DESC , Age DESC ) ;
 -- CREATE INDEX RelationAge On T1 ( Relation , Age ) ;
 -- DROP INDEX AgeName ; 
@@ -16,8 +17,7 @@
 -- RUNSTATS T2 ;
 -- CREATE INDEX IX1 ON T3 ( NAME DESC ) ;
 -- CREATE INDEX IX2 ON T3 ( NAME DESC , AGE DESC , RELATION DESC ) ;
-CREATE INDEX NameAgeNull ON T4 ( Name , Age ) ;
-CREATE INDEX NameAgeNullD1 ON T4 ( Name DESC , Age  ) ;
-CREATE INDEX NameAgeNullD2 ON T4 ( Name  , Age  DESC ) ;
-CREATE INDEX NameAgeNullDESC ON T4 ( Name DESC , Age  DESC ) ;
+-- REATE INDEX NameAgeNullD1 ON T4 ( Name DESC , Age  ) ;
+-- CREATE INDEX NameAgeNullD2 ON T4 ( Name  , Age  DESC ) ;
+-- CREATE INDEX NameAgeNullDESC ON T4 ( Name DESC , Age  DESC ) ;
 

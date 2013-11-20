@@ -1,9 +1,9 @@
-import java.io.PrintStream;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Predicate {
-
+	public ColumnName left, right;
+		
 	public boolean inList = false; // true if predicate is an inlist
 
 	public boolean join; // true if join predicate, false if local predicate
