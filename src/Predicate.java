@@ -2,12 +2,14 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 
 public class Predicate {
+	
 	public ColumnName left, right;
-		
+
 	public boolean inList = false; // true if predicate is an inlist
 
 	public boolean join; // true if join predicate, false if local predicate
 
+	public String litValue;
 	// Related to output table
 	public char type = ' '; // E (equal), R (range), I (IN list)
 
@@ -109,17 +111,17 @@ public class Predicate {
 		int n = 1;
 		System.out
 				.println("-------------------------------------------------------------------------------------------");
-		System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-15s %n",
+		System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-25s %-25s %n",
 				"| Predicate Table", "| Type", "| C1", "| C2", "| FF1",
-				"| FF2", "| Seq", "| Text");
+				"| FF2", "| Seq", "| Text", "| Description");
 		System.out
 				.println("-------------------------------------------------------------------------------------------");
 		for (Predicate p : predicates) {
-			System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-15s %n",
+			System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-25s %-25s %n",
 					"| PredNo" + n, "| " + p.getType(), "| " + p.getCard1(),
 					"| " + p.getCard2(), "| " + df.format(p.getFf1()), "| "
 							+ df.format(p.getFf2()), "| " + p.getSequence(),
-					"| " + p.getText());
+					"| " + p.getText() + "| " + p.getDescription());
 			System.out
 					.println("-------------------------------------------------------------------------------------------");
 			n++;

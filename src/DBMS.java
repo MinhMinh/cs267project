@@ -27,6 +27,7 @@ public class DBMS {
 	private ArrayList<ColumnName> whereColumns;
 	private ArrayList<ColumnName> sortColumns;
 	private ArrayList<String> fromTables;
+	private ArrayList<Predicate> predicates;
 
 	public DBMS() {
 		tables = new ArrayList<Table>();
@@ -196,19 +197,17 @@ public class DBMS {
 			for (File tableFile : tableDir.listFiles()) {
 				// For each file check if the file extension is ".tab"
 				String tableName = tableFile.getName();
-				
 				int periodLoc = tableName.lastIndexOf(".");
 				String tableFileExt = tableName.substring(tableName
 						.lastIndexOf(".") + 1);
 				if (tableFileExt.equalsIgnoreCase("tab")) {
-					System.out.println("Reading table: " + tableName);
 					// If it is a ".tab" file, create a table structure
 					Table table = new Table(tableName.substring(0, periodLoc));
 					Scanner in = new Scanner(tableFile);
 
 					try {
 						// Read the file to get Column definitions
-						int numCols = Integer.parseInt(in.nextLine().trim());
+						int numCols = Integer.parseInt(in.nextLine());
 
 						for (int i = 0; i < numCols; i++) {
 							StringTokenizer tokenizer = new StringTokenizer(
@@ -226,7 +225,7 @@ public class DBMS {
 								break;
 							case 'I':
 								table.addColumn(new Column(i + 1, name,
-										Column.ColType.INT, 10, nullable));
+										Column.ColType.INT, 4, nullable));
 								break;
 							default:
 								break;
@@ -234,7 +233,7 @@ public class DBMS {
 						}
 
 						// Read the file for index definitions
-						int numIdx = Integer.parseInt(in.nextLine().trim());
+						int numIdx = Integer.parseInt(in.nextLine());
 						for (int i = 0; i < numIdx; i++) {
 							StringTokenizer tokenizer = new StringTokenizer(
 									in.nextLine());
@@ -268,11 +267,33 @@ public class DBMS {
 						}
 
 						// Read the data from the file
-						int numRows = Integer.parseInt(in.nextLine().trim());
+						int numRows = Integer.parseInt(in.nextLine());
 						for (int i = 0; i < numRows; i++) {
 							table.addData(in.nextLine());
-//							System.out.println(i);
 						}
+						
+						// Read RUNSTATS from the file
+						while(in.hasNextLine()) {
+							String line = in.nextLine();
+							StringTokenizer toks = new StringTokenizer(line);
+							if(toks.nextToken().equals("STATS")) {
+								String stats = toks.nextToken();
+								if(stats.equals("TABCARD")) {
+									table.setTableCard(Integer.parseInt(toks.nextToken()));
+								} else if (stats.equals("COLCARD")) {
+									Column col = table.getColumns().get(Integer.parseInt(toks.nextToken()));
+									col.setColCard(Integer.parseInt(toks.nextToken()));
+									col.setHiKey(toks.nextToken());
+									col.setLoKey(toks.nextToken());
+								} else {
+									throw new DbmsError("Invalid STATS.");
+								}
+							} else {
+								throw new DbmsError("Invalid STATS.");
+							}
+						}
+					} catch (DbmsError ex) {
+						throw ex;
 					} catch (Exception ex) {
 						throw new DbmsError("Invalid table file format.");
 					} finally {
@@ -286,7 +307,7 @@ public class DBMS {
 					"The system cannot find the tables directory specified.");
 		}
 	}
-
+	
 	/**
 	 * Loads specified table to memory
 	 * 
@@ -689,6 +710,19 @@ public class DBMS {
 				out.println("Unable to delete table file for "
 						+ table.getTableName() + ".");
 			}
+			
+			// Delete the index files too
+			for (Index index : table.getIndexes()) {
+				File indexFile = new File(TABLE_FOLDER_NAME, table.getTableName()
+						+ index.getIdxName() + INDEX_FILE_EXT);
+				
+				try {
+					indexFile.delete();
+				} catch (Exception ex) {
+					out.println("Unable to delete table file for "
+							+ indexFile.getName() + ".");
+				}
+			}
 		} else {
 			// Create the table file writer
 			PrintWriter out = new PrintWriter(tableFile);
@@ -707,18 +741,20 @@ public class DBMS {
 			// Write the index info
 			out.println(table.getNumIndexes());
 			for (Index index : table.getIndexes()) {
-				String idxInfo = index.getIdxName() + " " + index.getIsUnique()
-						+ " ";
+				if(!index.delete) {
+					String idxInfo = index.getIdxName() + " " + index.getIsUnique()
+							+ " ";
 
-				for (Index.IndexKeyDef def : index.getIdxKey()) {
-					idxInfo += def.colId;
-					if (def.descOrder) {
-						idxInfo += "D ";
-					} else {
-						idxInfo += "A ";
+					for (Index.IndexKeyDef def : index.getIdxKey()) {
+						idxInfo += def.colId;
+						if (def.descOrder) {
+							idxInfo += "D ";
+						} else {
+							idxInfo += "A ";
+						}
 					}
+					out.println(idxInfo);
 				}
-				out.println(idxInfo);
 			}
 
 			// Write the rows of data
@@ -727,59 +763,30 @@ public class DBMS {
 				out.println(data);
 			}
 
+			// Write RUNSTATS
+			out.println("STATS TABCARD " + table.getTableCard());
+			for (int i = 0; i < table.getColumns().size(); i++) {
+				Column col = table.getColumns().get(i);
+				if(col.getHiKey() == null)
+					col.setHiKey("-");
+				if(col.getLoKey() == null)
+					col.setLoKey("-");
+				out.println("STATS COLCARD " + i + " " + col.getColCard() + " " + col.getHiKey() + " " + col.getLoKey());
+			}
+			
 			out.flush();
 			out.close();
-		}
-
-		// Save indexes to file
-		for (Index index : table.getIndexes()) {
-
-			File indexFile = new File(TABLE_FOLDER_NAME, table.getTableName()
-					+ index.getIdxName() + INDEX_FILE_EXT);
-
-			// Delete the file if it was marked for deletion
-			if (index.delete) {
-				try {
-					indexFile.delete();
-				} catch (Exception ex) {
-					out.println("Unable to delete index file for "
-							+ indexFile.getName() + ".");
-				}
-			} else {
-				PrintWriter out = new PrintWriter(indexFile);
-				String idxInfo = index.getIdxName() + " " + index.getIsUnique()
-						+ " ";
-
-				// Write index definition
-				for (Index.IndexKeyDef def : index.getIdxKey()) {
-					idxInfo += def.colId;
-					if (def.descOrder) {
-						idxInfo += "D ";
-					} else {
-						idxInfo += "A ";
-					}
-				}
-				out.println(idxInfo);
-
-				// Write index keys
-				out.println(index.getKeys().size());
-				for (Index.IndexKeyVal key : index.getKeys()) {
-					out.println(key.rid + " '" + key.value + "'");
-				}
-
-				out.flush();
-				out.close();
-
-			}
 		}
 	}
 
 	private void select(String sql, StringTokenizer tokenizer) throws Exception {
 		try {
+			System.out.println("Parsing SELECT statement ... ");
 			selectColumns = new ArrayList<ColumnName>();
 			whereColumns = new ArrayList<ColumnName>();
 			sortColumns = new ArrayList<ColumnName>();
 			fromTables = new ArrayList<String>();
+			predicates = new ArrayList<Predicate>();
 			
 			boolean hasMore = true;
 			String token = tokenizer.nextToken();
@@ -790,17 +797,19 @@ public class DBMS {
 				selectColumns.add(new ColumnName(token.substring(0, id), token.substring(id + 1)));
 
 				token = tokenizer.nextToken();
-				hasMore = ",".endsWith(token);
+				hasMore = ",".equalsIgnoreCase(token);
 			}
 			
-			//token == "WHERE"
+			//token == "FROM"
 			token = tokenizer.nextToken();
 			hasMore = true;
 			while (hasMore) {
 				fromTables.add(token);
 				token = tokenizer.nextToken();
-				hasMore = ",".endsWith(token);
+				hasMore = ",".equalsIgnoreCase(token);
 			}
+			
+			System.out.println("After FROM");
 			
 			if (token.equalsIgnoreCase("WHERE")) {
 				token = tokenizer.nextToken();
@@ -814,28 +823,55 @@ public class DBMS {
 					p.left = new ColumnName(token.substring(0, id), token.substring(id + 1));
 					
 					token = tokenizer.nextToken(); //condition
-					switch (token) {
-					case "=": 
-						p.setType('E');
-						
-						break;
-					case "<":
-						p.setType('R');
-						break;
-					case ">":
-						p.setType('R');
-						break;
-					default: //IN condition
+					p.text += " " + token;
+					if (token.equalsIgnoreCase("IN")) {
 						p.setType('I');
 						p.setInList(true);
-						break;
-					}
-					
+						
+						//Parse IN list
+					} else if ("=><".contains(token)) {
+						if ("=".equalsIgnoreCase(token)) p.setType('E');
+						else p.setType('R');
+						
+						token = tokenizer.nextToken();
+						if (token.contains(".")) { //Join predicate
+							p.setJoin(true);
+							p.right = new ColumnName(token.substring(0, id), token.substring(id + 1));
+							
+							p.text += " " + token;
+						} else {
+							p.setJoin(false);
+							p.litValue = token;
+							
+							p.text += " " + token;
+						}
+						
+					} else throw new NoSuchElementException(); 
 					
 					token = tokenizer.nextToken();
-					hasMore = ",".endsWith(token);
+					//check if token == ')'
+					while (")".equals(token)) {
+//						p.text += " )";
+						token = tokenizer.nextToken();
+					}
+						
+					hasMore = "AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token); 
+					
+					if (hasMore) {
+//						p.text += " " + token;
+						token = tokenizer.nextToken();
+						while ("(".equals(token)) {
+//							p.text += " (" + token;
+							token = tokenizer.nextToken();
+						}
+					}
+					
+					System.out.println(p.text);
+					predicates.add(p);
 				}			
 			} 
+			
+			System.out.println("After WHERE");
 			
 			if (token.equalsIgnoreCase("ORDER")) {
 				token = tokenizer.nextToken();
@@ -857,6 +893,8 @@ public class DBMS {
 			}
 			
 			if (! ";".equals(token)) throw new NoSuchElementException();
+			
+			System.out.println("Successfully parsing ...");
 		} catch (NoSuchElementException ex) {
 			throw new DbmsError("Invalid SELECT statement. '" + sql + "'.");			
 		}	

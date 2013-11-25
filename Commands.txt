@@ -1,4 +1,5 @@
-SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;
+-- SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 AND T2.col2 > 100 AND ( T3.col1 = 200 OR T3.col1 = 400 ) ;
+SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 AND ( T2.col2 > 100 AND ( T3.col1 = 200 OR T3.col1 = 400 ) ) ;
 -- CREATE INDEX RelationAgeDESC On T1 ( Relation DESC , Age DESC ) ;
 -- CREATE INDEX RelationAge On T1 ( Relation , Age ) ;
 -- DROP INDEX AgeName ; 

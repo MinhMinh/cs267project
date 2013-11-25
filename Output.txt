@@ -423,3 +423,12 @@
 31.10.13 17:35:41 :	Index NameAgeNullDESC already exist in the table T4
 19.11.13 15:46:52 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT SELECT T1.col3 FROM T1 ;'.
 19.11.13 15:47:44 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT SELECT T1.col3 FROM T1 ;'.
+24.11.13 20:57:58 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;'.
+24.11.13 20:58:07 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;'.
+24.11.13 20:59:13 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;'.
+24.11.13 21:44:58 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;'.
+24.11.13 21:45:14 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 ;'.
+25.11.13 15:12:40 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 AND T2.col2 > 100 ;'.
+25.11.13 15:22:41 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 AND T2.col2 > 100 AND ( T3.col1 = 200 OR T3.col1 = 400 ) ;'.
+25.11.13 15:29:48 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 AND ( T2.col2 > 100 AND ( T3.col1 = 200 OR T3.col1 = 400 ) ) ;'.
+25.11.13 15:29:54 :	DBMS ERROR:  Invalid SELECT statement. 'SELECT T1.col3 FROM T1 WHERE T1.col1 = 100 AND ( T2.col2 > 100 AND ( T3.col1 = 200 OR T3.col1 = 400 ) ) ;'.
