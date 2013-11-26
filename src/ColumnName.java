@@ -4,8 +4,8 @@ public class ColumnName {
 	String colName;
 	
 	public ColumnName(String tableName, String colName) {
-		this.tableName = tableName;
-		this.colName = colName;
+		this.tableName = tableName.toUpperCase();
+		this.colName = colName.toUpperCase();
 	}
 	
 	public String getTabelName() {

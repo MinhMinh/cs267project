@@ -30,6 +30,8 @@ public class DBMS {
 	private ArrayList<ColumnName> sortColumns;
 	private ArrayList<String> fromTables;
 	private ArrayList<Predicate> predicates;
+	
+	HashMap<String, Integer> tableNames;
 
 	public DBMS() {
 		tables = new ArrayList<Table>();
@@ -66,7 +68,7 @@ public class DBMS {
 			
 			// Go through each line in the Command.txt file
 			while (in.hasNextLine()) {
-				String sql = in.nextLine();
+				String sql = in.nextLine().toUpperCase();
 				StringTokenizer tokenizer = new StringTokenizer(sql);
 
 				// Evaluate the SQL statement
@@ -165,7 +167,7 @@ public class DBMS {
 
 			// Save tables to files
 			for (Table table : db.tables) {
-				db.storeTableFile(table);
+//				db.storeTableFile(table);
 			}
 		} catch (DbmsError ex) {
 			db.out.println("DBMS ERROR:  " + ex.getMessage());
@@ -233,7 +235,6 @@ public class DBMS {
 								break;
 							}
 						}
-
 						// Read the file for index definitions
 						int numIdx = Integer.parseInt(in.nextLine());
 						for (int i = 0; i < numIdx; i++) {
@@ -308,6 +309,10 @@ public class DBMS {
 			throw new FileNotFoundException(
 					"The system cannot find the tables directory specified.");
 		}
+		
+		Utils utils = new Utils();
+		tables.add(utils.createTableT1());
+		tables.add(utils.createTableT2());
 	}
 	
 	/**
@@ -791,8 +796,9 @@ public class DBMS {
 			predicates = new ArrayList<Predicate>();
 			
 			boolean hasMore = true;
-			String token = tokenizer.nextToken();
+			String token;
 			while (hasMore) {
+				token = tokenizer.nextToken();
 				int id = token.indexOf(".");
 				if (id == -1) throw new NoSuchElementException();
 				
@@ -809,6 +815,7 @@ public class DBMS {
 				fromTables.add(token);
 				token = tokenizer.nextToken();
 				hasMore = ",".equalsIgnoreCase(token);
+				if (hasMore) token = tokenizer.nextToken();
 			}
 			
 			System.out.println("After FROM");
@@ -849,8 +856,9 @@ public class DBMS {
 						
 						if (!")".equals(token)) throw new NoSuchElementException();
 						p.text += " " + token;
-					} else if ("=><".contains(token)) {
+					} else if ("=<>".contains(token)) {
 						if ("=".equalsIgnoreCase(token)) p.setType('E');
+						else if ("<".equals(token)) p.setType('r'); 
 						else p.setType('R');
 						
 						token = tokenizer.nextToken();
@@ -921,7 +929,6 @@ public class DBMS {
 		}	
 		
 		//Print out after parsing
-		
 		System.out.println("SELECT");
 		for (ColumnName c : selectColumns) {
 			System.out.println(c.tableName + "." + c.colName);
@@ -941,27 +948,100 @@ public class DBMS {
 		for (ColumnName c : sortColumns) {
 			System.out.println(c.tableName + "." + c.colName);
 		}
-		
 		//Evaluate
 		evaluatePlanTable();
 	}
 	
 	private void evaluatePlanTable() {
+		if (!checkValidate()) return;
+		
+		fillInPredicates();
 		
 		
+		
+		//fill Plan Table
 		PlanTable planTable = new PlanTable();
+		Predicate.printTable(out, predicates);
 		
-		
-		
-		planTable.printTable(out);
+//		planTable.printTable(out);
+	}
+	
+	private void fillInPredicates() {
+		//fill in predicates
+		for (Predicate p : predicates) {
+			String tableName = p.left.tableName;
+			String colName = p.left.colName;
+			
+			Table t = tables.get(tableNames.get(tableName));
+			for (int i = 0; i < t.getColumns().size(); i++) 
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+					Column c = t.getColumns().get(i);
+					p.setCard1(c.getColCard());
+					switch (p.type) {
+					case 'E':
+						p.setFf1(1.0 / p.getCard1());
+						break;
+					case 'I':
+						p.setFf1(1.0 * p.values.size() / p.getCard1());
+						break;
+					case 'r': //left smaller than right
+						//need to calculate for range
+						p.setFf1(1.0 * (value(p.values.get(0), c.getColType()) - value(c.getLoKey(), c.getColType())) / (value(c.getHiKey(), c.getColType()) - value(c.getLoKey(), c.getColType())));
+						break;
+					case 'R':
+						p.setFf1(1.0 * (value(c.getHiKey(), c.getColType()) - value(p.values.get(0), c.getColType())) / (value(c.getHiKey(), c.getColType()) - value(c.getLoKey(), c.getColType())));
+						break;
+					}
+					break;
+				}
+			
+			if (p.join) {
+				tableName = p.right.tableName;
+				colName = p.right.colName;
+				
+				t = tables.get(tableNames.get(tableName));
+				for (int i = 0; i < t.getColumns().size(); i++) 
+					if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+						Column c = t.getColumns().get(i);
+						p.setCard2(c.getColCard());
+						switch (p.type) {
+						case 'E':
+							p.setFf2(1.0 / p.getCard2());
+							break;
+						case 'R':
+							//need to calculate for range
+							break;
+						}
+						break;
+					}
+			}
+		}
+	}
+
+	private int value(String v, Column.ColType type) {
+		if (type.equals(Column.ColType.INT))
+			return Integer.parseInt(v);
+		v = v.toUpperCase();
+		return (v.charAt(0) - 'A' + 1) * 26 + (v.charAt(1) - 'A' + 1); 
 	}
 	
 	private boolean checkValidate() {
-		HashMap<String, Integer> tableNames = new HashMap<String, Integer>();
+		tableNames = new HashMap<String, Integer>();
 		for (int i = 0; i < tables.size(); i++) {
-			doRunstats(tables.get(i).getTableName());
+//			doRunstats(tables.get(i).getTableName());
 			tableNames.put(tables.get(i).getTableName(), i);
 		}
+		
+		/*
+		for (Table t : tables) {
+			System.out.println("Name: " + t.getTableName() + ", Cardinality: " + t.getTableCard() + ", Columns: " + t.getNumColumns());
+			System.out.println("Indexes: " + t.getNumIndexes());
+			for (Index index : t.getIndexes()) {
+				System.out.println(index.getIdxName());
+			}
+			System.out.println("----");
+		}
+		*/
 		
 		for (ColumnName c : selectColumns) {
 			if (!tableNames.containsKey(c.tableName)) {
@@ -969,7 +1049,15 @@ public class DBMS {
 				return false;
 			}
 			int id = tableNames.get(c.tableName);
-			if (!tables.get(id).getColumns().contains(c.colName)) {
+			Table t = tables.get(id);
+			boolean found = false;
+			for (int i = 0; i < t.getColumns().size(); i++) {
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(c.colName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
 				System.out.println("Table " + c.tableName + " does not have column " + c.colName);
 				return false;
 			}
@@ -988,7 +1076,15 @@ public class DBMS {
 				return false;
 			}
 			int id = tableNames.get(c.tableName);
-			if (!tables.get(id).getColumns().contains(c.colName)) {
+			Table t = tables.get(id);
+			boolean found = false;
+			for (int i = 0; i < t.getColumns().size(); i++) {
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(c.colName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
 				System.out.println("Table " + c.tableName + " does not have column " + c.colName);
 				return false;
 			}
@@ -1000,7 +1096,15 @@ public class DBMS {
 				return false;
 			}
 			int id = tableNames.get(c.tableName);
-			if (!tables.get(id).getColumns().contains(c.colName)) {
+			Table t = tables.get(id);
+			boolean found = false;
+			for (int i = 0; i < t.getColumns().size(); i++) {
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(c.colName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
 				System.out.println("Table " + c.tableName + " does not have column " + c.colName);
 				return false;
 			}
@@ -1027,7 +1131,7 @@ public class DBMS {
 			}
 			
 			// Get the table name
-			String tableName = tokenizer.nextToken().toUpperCase();
+			String tableName = tokenizer.nextToken();
 			
 			//check if table exists
 			Table onTable = null;

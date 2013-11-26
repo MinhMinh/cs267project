@@ -1,0 +1,16 @@
+11
+C1 I false
+C2 I false
+C3 C1 false
+C4 I false
+C5 I false
+2
+T2X1 false 1A 2A 
+T2X2 false 2A 3A 
+0
+STATS TABCARD 0
+STATS COLCARD 0 50 - -
+STATS COLCARD 1 20 - -
+STATS COLCARD 2 5 - -
+STATS COLCARD 3 25 - -
+STATS COLCARD 4 20 - -

@@ -17,7 +17,7 @@ public class Column {
 	
 	public Column(int id, String name, ColType type, int length, boolean nullable) {
 		colId = id;
-		colName = name;
+		colName = name.toUpperCase();
 		colType = type;
 		colLength = length;
 		colNullable = nullable;
@@ -28,7 +28,7 @@ public class Column {
 	}
 
 	public void setColName(String colName) {
-		this.colName = colName;
+		this.colName = colName.toUpperCase();
 	}
 
 	public int getColId() {

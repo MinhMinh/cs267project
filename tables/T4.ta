@@ -1,7 +1,7 @@
 3
-Name C8 true
-Age I true
-Relation C10 true
+NAME C8 true
+AGE I true
+RELATION C10 true
 4
 NameAgeNull false 1A 2A 
 NameAgeNullD1 false 1D 2A 

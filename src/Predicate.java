@@ -42,7 +42,7 @@ public class Predicate {
 	}
 
 	public char getType() {
-		return type;
+		return Character.toUpperCase(type);
 	}
 
 	public void setType(char type) {
@@ -105,25 +105,25 @@ public class Predicate {
 		this.description = description;
 	}
 
-	public void printTable(DbmsPrinter out, ArrayList<Predicate> predicates) {
+	public static void printTable(DbmsPrinter out, ArrayList<Predicate> predicates) {
 		DecimalFormat df = new DecimalFormat("#.###");
 
 		int n = 1;
 		System.out
-				.println("-------------------------------------------------------------------------------------------");
-		System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-25s %-25s %n",
+				.println("-------------------------------------------------------------------------------------------------------------------------");
+		System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-30s %-35s %n",
 				"| Predicate Table", "| Type", "| C1", "| C2", "| FF1",
 				"| FF2", "| Seq", "| Text", "| Description");
 		System.out
-				.println("-------------------------------------------------------------------------------------------");
+				.println("-------------------------------------------------------------------------------------------------------------------------");
 		for (Predicate p : predicates) {
-			System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-25s %-25s %n",
+			System.out.printf("%-20s %-7s %-7s %-7s %-7s %-7s %-7s %-30s %-35s %n",
 					"| PredNo" + n, "| " + p.getType(), "| " + p.getCard1(),
 					"| " + p.getCard2(), "| " + df.format(p.getFf1()), "| "
 							+ df.format(p.getFf2()), "| " + p.getSequence(),
-					"| " + p.getText() + "| " + p.getDescription());
+					"| " + p.getText(), "| " + p.getDescription());
 			System.out
-					.println("-------------------------------------------------------------------------------------------");
+					.println("-------------------------------------------------------------------------------------------------------------------------");
 			n++;
 		}
 	}
