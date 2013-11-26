@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -23,6 +24,7 @@ public class DBMS {
 
 	private DbmsPrinter out;
 	private ArrayList<Table> tables;
+	
 	private ArrayList<ColumnName> selectColumns;
 	private ArrayList<ColumnName> whereColumns;
 	private ArrayList<ColumnName> sortColumns;
@@ -821,6 +823,7 @@ public class DBMS {
 					int id = token.indexOf(".");
 					if (id == -1) throw new NoSuchElementException();
 					p.left = new ColumnName(token.substring(0, id), token.substring(id + 1));
+					whereColumns.add(p.left);
 					
 					token = tokenizer.nextToken(); //condition
 					p.text += " " + token;
@@ -829,6 +832,23 @@ public class DBMS {
 						p.setInList(true);
 						
 						//Parse IN list
+						token = tokenizer.nextToken();
+						if (!"(".equals(token)) throw new NoSuchElementException();
+						p.text += " " + token;
+						
+						hasMore = true;
+						while (hasMore) {
+							token = tokenizer.nextToken();
+							p.values.add(token);
+							p.text += " " + token;
+							
+							token = tokenizer.nextToken();
+							hasMore = ",".equals(token);
+							if (hasMore) p.text += " ,";
+						}
+						
+						if (!")".equals(token)) throw new NoSuchElementException();
+						p.text += " " + token;
 					} else if ("=><".contains(token)) {
 						if ("=".equalsIgnoreCase(token)) p.setType('E');
 						else p.setType('R');
@@ -837,11 +857,12 @@ public class DBMS {
 						if (token.contains(".")) { //Join predicate
 							p.setJoin(true);
 							p.right = new ColumnName(token.substring(0, id), token.substring(id + 1));
+							whereColumns.add(p.right);
 							
 							p.text += " " + token;
 						} else {
 							p.setJoin(false);
-							p.litValue = token;
+							p.values.add(token);
 							
 							p.text += " " + token;
 						}
@@ -877,18 +898,18 @@ public class DBMS {
 				token = tokenizer.nextToken();
 				if (!token.equalsIgnoreCase("BY")) throw new NoSuchElementException();
 				
-				token = tokenizer.nextToken();
 				hasMore = true;
 				while (hasMore) {
+					token = tokenizer.nextToken();
 					int id = token.indexOf(".");
 					if (id == -1) throw new NoSuchElementException();
 					sortColumns.add(new ColumnName(token.substring(0, id), token.substring(id + 1)));
 					
 					token = tokenizer.nextToken(); //Don't care about 'A' or 'D'
-					if (token.equalsIgnoreCase("D"))
+					if (token.equalsIgnoreCase("D") || token.equalsIgnoreCase("A"))
 						token = tokenizer.nextToken();
 					
-					hasMore = ",".endsWith(token);
+					hasMore = ",".equals(token);
 				}
 			}
 			
@@ -898,6 +919,94 @@ public class DBMS {
 		} catch (NoSuchElementException ex) {
 			throw new DbmsError("Invalid SELECT statement. '" + sql + "'.");			
 		}	
+		
+		//Print out after parsing
+		
+		System.out.println("SELECT");
+		for (ColumnName c : selectColumns) {
+			System.out.println(c.tableName + "." + c.colName);
+		}
+		
+		System.out.println("FROM");
+		for (String c : fromTables) {
+			System.out.println(c);
+		}
+		
+		System.out.println("WHERE");
+		for (ColumnName c : whereColumns) {
+			System.out.println(c.tableName + "." + c.colName);
+		}
+		
+		System.out.println("ORDER BY");
+		for (ColumnName c : sortColumns) {
+			System.out.println(c.tableName + "." + c.colName);
+		}
+		
+		//Evaluate
+		evaluatePlanTable();
+	}
+	
+	private void evaluatePlanTable() {
+		
+		
+		PlanTable planTable = new PlanTable();
+		
+		
+		
+		planTable.printTable(out);
+	}
+	
+	private boolean checkValidate() {
+		HashMap<String, Integer> tableNames = new HashMap<String, Integer>();
+		for (int i = 0; i < tables.size(); i++) {
+			doRunstats(tables.get(i).getTableName());
+			tableNames.put(tables.get(i).getTableName(), i);
+		}
+		
+		for (ColumnName c : selectColumns) {
+			if (!tableNames.containsKey(c.tableName)) {
+				System.out.println("Database does not have table: " + c.tableName);
+				return false;
+			}
+			int id = tableNames.get(c.tableName);
+			if (!tables.get(id).getColumns().contains(c.colName)) {
+				System.out.println("Table " + c.tableName + " does not have column " + c.colName);
+				return false;
+			}
+		}
+		
+		for (String c : fromTables) {
+			if (!tableNames.containsKey(c)) {
+				System.out.println("Database does not have table: " + c);
+				return false;
+			} 
+		}
+		
+		for (ColumnName c : whereColumns) {
+			if (!tableNames.containsKey(c.tableName)) {
+				System.out.println("Database does not have table: " + c.tableName);
+				return false;
+			}
+			int id = tableNames.get(c.tableName);
+			if (!tables.get(id).getColumns().contains(c.colName)) {
+				System.out.println("Table " + c.tableName + " does not have column " + c.colName);
+				return false;
+			}
+		}
+		
+		for (ColumnName c : sortColumns) {
+			if (!tableNames.containsKey(c.tableName)) {
+				System.out.println("Database does not have table: " + c.tableName);
+				return false;
+			}
+			int id = tableNames.get(c.tableName);
+			if (!tables.get(id).getColumns().contains(c.colName)) {
+				System.out.println("Table " + c.tableName + " does not have column " + c.colName);
+				return false;
+			}
+		}
+		
+		return true;
 	}
 	
 	private void createIndex(String sql, StringTokenizer tokenizer, boolean isUnique) throws Exception {

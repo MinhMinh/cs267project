@@ -15,7 +15,7 @@ RelationAge false 3A 2A
   3 Joe              35 -          
   4 Joan             35 mother     
   5 Jake             35 son        
-STATS TABCARD 0
-STATS COLCARD 0 0 - -
-STATS COLCARD 1 0 - -
-STATS COLCARD 2 0 - -
+STATS TABCARD 6
+STATS COLCARD 0 6 John     Jake    
+STATS COLCARD 1 1 0000 0000
+STATS COLCARD 2 4    35 son     31 brot

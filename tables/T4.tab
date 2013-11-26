@@ -18,7 +18,7 @@ NameAgeNullDESC false 1D 2D
   8 -                45 brother
   9 Ram               - son
  10 Ram              55 brother
-STATS TABCARD 0
-STATS COLCARD 0 0 - -
-STATS COLCARD 1 0 - -
-STATS COLCARD 2 0 - -
+STATS TABCARD 10
+STATS COLCARD 0 7 Ram      Jake    
+STATS COLCARD 1 1 0000 0000
+STATS COLCARD 2 9    55 brot     5 sist

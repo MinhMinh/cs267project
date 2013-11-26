@@ -9,7 +9,7 @@ public class Predicate {
 
 	public boolean join; // true if join predicate, false if local predicate
 
-	public String litValue;
+	public ArrayList<String> values = new ArrayList<String>();
 	// Related to output table
 	public char type = ' '; // E (equal), R (range), I (IN list)
 
