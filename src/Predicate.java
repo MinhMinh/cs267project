@@ -3,7 +3,9 @@ import java.util.ArrayList;
 
 public class Predicate {
 	
-	public ColumnName left, right;
+	public ColumnName left = null, right = null;
+	
+	public String operation = "";
 
 	public boolean inList = false; // true if predicate is an inlist
 

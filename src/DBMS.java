@@ -888,6 +888,7 @@ public class DBMS {
 					
 					if (hasMore) {
 //						p.text += " " + token;
+						p.operation = token;
 						token = tokenizer.nextToken();
 						while ("(".equals(token)) {
 //							p.text += " (" + token;
@@ -955,6 +956,7 @@ public class DBMS {
 	private void evaluatePlanTable() {
 		if (!checkValidate()) return;
 		
+		transformPredicates();
 		fillInPredicates();
 		
 		
@@ -964,6 +966,36 @@ public class DBMS {
 		Predicate.printTable(out, predicates);
 		
 //		planTable.printTable(out);
+	}
+	
+	private void transformPredicates() {
+		//In-List transformation
+		for (int i = predicates.size() - 2; i >= 0; i--) {
+			Predicate p = predicates.get(i); 
+			if (p.operation.equals("OR") && !p.inList &&
+				p.left.tableName.equals(predicates.get(i + 1).left.tableName) &&
+				p.left.colName.equals(predicates.get(i + 1).left.colName)) {
+				p.text += " OR " + predicates.get(i+1).text;
+				p.type = 'I';
+				p.values.addAll(predicates.get(i + 1).values);
+				p.description = p.left.tableName + "." + p.left.colName + " IN ( ";
+				for (int j = 0; j < p.values.size() - 1; j++)
+					p.description += p.values.get(j) + " , ";
+				p.description += p.values.get(p.values.size() - 1) + " )";
+				
+				predicates.remove(i+1);
+			}
+		}
+		
+		//Reverse In-List transformation
+		for (Predicate p : predicates) {
+			if (p.getType() == 'I' && p.values.size() == 1) {
+				p.type = 'E';
+				p.description = p.left.tableName + "." + p.left.colName + " = " + p.values.get(0);
+			}
+		}
+		
+		//Transitive Closure Prdicate
 	}
 	
 	private void fillInPredicates() {
@@ -1007,9 +1039,6 @@ public class DBMS {
 						switch (p.type) {
 						case 'E':
 							p.setFf2(1.0 / p.getCard2());
-							break;
-						case 'R':
-							//need to calculate for range
 							break;
 						}
 						break;
