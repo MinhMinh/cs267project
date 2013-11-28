@@ -3,7 +3,7 @@ import java.util.ArrayList;
 
 public class Predicate {
 	
-	public ColumnName left = null, right = null;
+	public String left = "", right = "";
 	
 	public String operation = "";
 
