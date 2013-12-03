@@ -112,7 +112,7 @@ public class PlanTable {
 		out.println("--------------------------------------------------------------------------------------------------------------");
 		out.println(String.format("%-20s %-20s %-15s", "| QBlockNo " , "| " + queryBlockNo, "| Always 1 since we only have one block "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
-		out.println(String.format("%-20s %-20s %-15s", "| Access Type ", "| " + accessType, "| R – TS scan; I – Index Scan; N – IN list index scan "));
+		out.println(String.format("%-20s %-20s %-15s", "| Access Type ", "| " + accessType, "| R ï¿½ TS scan; I ï¿½ Index Scan; N ï¿½ IN list index scan "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
 		out.println(String.format("%-20s %-20s %-15s", "| MatchCols ", "| " + matchCols, "| Number of matched columns in the INDEX key where ACCESSTYPE is I or N "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
@@ -120,13 +120,13 @@ public class PlanTable {
 		out.println("--------------------------------------------------------------------------------------------------------------");
 		out.println(String.format("%-20s %-20s %-15s", "| IndexOnly ", "| " + indexOnly, "| Y or N"));
 		out.println("--------------------------------------------------------------------------------------------------------------");
-		out.println(String.format("%-20s %-20s %-15s", "| Prefetch ", "| " + prefetch, "| Blank – no prefetch; S – sequential prefetch "));
+		out.println(String.format("%-20s %-20s %-15s", "| Prefetch ", "| " + prefetch, "| Blank ï¿½ no prefetch; S ï¿½ sequential prefetch "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
 		out.println(String.format("%-20s %-20s %-15s", "| SortC_OrderBy ", "| " + sortC_orderBy, "| Y or N "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
 		out.println(String.format("%-20s %-20s %-15s", "| Table1Card ", "| " + table1Card, "| Table 1 Cardinality "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
-		out.println(String.format("%-20s %-20s %-15s", "| Table1Card ", "| " + table2Card, "| Table 2 Cardinality "));
+		out.println(String.format("%-20s %-20s %-15s", "| Table2Card ", "| " + table2Card, "| Table 2 Cardinality "));
 		out.println("--------------------------------------------------------------------------------------------------------------");
 		out.println(String.format("%-20s %-20s %-15s", "| LeadingTable ", "| " + leadTable, "| Table name of the outer table in NLJ "));
 		out.println("--------------------------------------------------------------------------------------------------------------");

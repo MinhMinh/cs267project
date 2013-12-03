@@ -42,7 +42,7 @@ public class DBMS {
 	 * Main method to run the DBMS engine.
 	 * 
 	 * @param args
-	 *            arg[0] is input file, arg[1] is output file.
+	 * arg[0] is input file, arg[1] is output file.
 	 */
 	@SuppressWarnings("resource")
 	public static void main(String[] args) {
@@ -249,7 +249,7 @@ public class DBMS {
 							while (tokenizer.hasMoreTokens()) {
 								String colDef = tokenizer.nextToken();
 								Index.IndexKeyDef def = index.new IndexKeyDef();
-								def.idxColPos = idxColPos;
+								def.idxColPos = idxColPos++;
 								def.colId = Integer.parseInt(colDef.substring(
 										0, colDef.length() - 1));
 								switch (colDef.charAt(colDef.length() - 1)) {
@@ -788,404 +788,6 @@ public class DBMS {
 			out.close();
 		}
 	}
-
-	private void select(String sql, StringTokenizer tokenizer) throws Exception {
-		try {
-//			System.out.println("Parsing SELECT statement ... ");
-			selectColumns = new ArrayList<String>();
-			whereColumns = new ArrayList<String>();
-			sortColumns = new ArrayList<String>();
-			fromTables = new ArrayList<String>();
-			predicates = new ArrayList<Predicate>();
-			
-			boolean hasMore = true;
-			String token;
-			while (hasMore) {
-				token = tokenizer.nextToken();
-				int id = token.indexOf(".");
-				if (id == -1) throw new NoSuchElementException();
-				
-				selectColumns.add(token);
-
-				token = tokenizer.nextToken();
-				hasMore = ",".equalsIgnoreCase(token);
-			}
-			
-			//token == "FROM"
-			token = tokenizer.nextToken();
-			hasMore = true;
-			while (hasMore) {
-				fromTables.add(token);
-				token = tokenizer.nextToken();
-				hasMore = ",".equalsIgnoreCase(token);
-				if (hasMore) token = tokenizer.nextToken();
-			}
-			
-//			System.out.println("After FROM");
-			
-			if (token.equalsIgnoreCase("WHERE")) {
-				token = tokenizer.nextToken();
-				
-				hasMore = true;
-				while (hasMore) {
-					while ("(".equals(token)) {
-						token = tokenizer.nextToken();
-					}
-					
-					Predicate p = new Predicate();
-					p.text += token; //Column name
-					
-					p.left = token;
-					whereColumns.add(p.left);
-					
-					token = tokenizer.nextToken(); //condition
-					p.text += " " + token;
-					if (token.equalsIgnoreCase("IN")) {
-						p.setType('I');
-						p.setInList(true);
-						
-						//Parse IN list
-						token = tokenizer.nextToken();
-						if (!"(".equals(token)) throw new NoSuchElementException();
-						p.text += " " + token;
-						
-						hasMore = true;
-						while (hasMore) {
-							token = tokenizer.nextToken();
-							p.values.add(token);
-							p.text += " " + token;
-							
-							token = tokenizer.nextToken();
-							hasMore = ",".equals(token);
-							if (hasMore) p.text += " ,";
-						}
-						
-						if (!")".equals(token)) throw new NoSuchElementException();
-						p.text += " " + token;
-					} else if ("=<>".contains(token)) {
-						if ("=".equalsIgnoreCase(token)) p.setType('E');
-						else if ("<".equals(token)) p.setType('r'); 
-						else p.setType('R');
-						
-						token = tokenizer.nextToken();
-						if (token.contains(".")) { //Join predicate
-							p.setJoin(true);
-							p.right = token;
-							whereColumns.add(p.right);
-							
-							p.text += " " + token;
-						} else {
-							p.setJoin(false);
-							p.values.add(token);
-							
-							p.text += " " + token;
-						}
-						
-						while (")".equals(token)) {
-							token = tokenizer.nextToken();
-						}
-					} else throw new NoSuchElementException(); 
-					
-					token = tokenizer.nextToken();
-					while (")".equals(token)) {
-						token = tokenizer.nextToken();
-					}
-						
-					hasMore = "AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token); 
-					
-					if (hasMore) {
-						p.operation = token;
-						token = tokenizer.nextToken();
-						while ("(".equals(token)) {
-							token = tokenizer.nextToken();
-						}
-					}
-					
-					predicates.add(p);
-				}			
-			} 
-			
-			if (token.equalsIgnoreCase("ORDER")) {
-				token = tokenizer.nextToken();
-				if (!token.equalsIgnoreCase("BY")) throw new NoSuchElementException();
-				
-				hasMore = true;
-				while (hasMore) {
-					token = tokenizer.nextToken();
-					int id = token.indexOf(".");
-					if (id == -1) throw new NoSuchElementException();
-					sortColumns.add(token);
-					
-					token = tokenizer.nextToken(); //Don't care about 'A' or 'D'
-					if (token.equalsIgnoreCase("D") || token.equalsIgnoreCase("A"))
-						token = tokenizer.nextToken();
-					
-					hasMore = ",".equals(token);
-				}
-			}
-			
-			if (! ";".equals(token)) throw new NoSuchElementException();
-			
-			System.out.println("Successfully parsing ...");
-		} catch (NoSuchElementException ex) {
-			throw new DbmsError("Invalid SELECT statement. '" + sql + "'.");			
-		}	
-
-		/*
-		//Print out after parsing
-		System.out.println("SELECT");
-		for (ColumnName c : selectColumns) {
-			System.out.println(c.tableName + "." + c.colName);
-		}
-		
-		System.out.println("FROM");
-		for (String c : fromTables) {
-			System.out.println(c);
-		}
-		
-		System.out.println("WHERE");
-		for (ColumnName c : whereColumns) {
-			System.out.println(c.tableName + "." + c.colName);
-		}
-		
-		System.out.println("ORDER BY");
-		for (ColumnName c : sortColumns) {
-			System.out.println(c.tableName + "." + c.colName);
-		}
-		*/
-		
-		//Evaluate
-		evaluatePlanTable();
-	}
-	
-	private void evaluatePlanTable() {
-		if (!checkValidate()) return;
-		
-		transformPredicates();
-		fillInPredicates();
-		
-		//fill Plan Table
-		fillInPlanTable();
-		
-		planTable.printTable(out);
-		Predicate.printTable(out, predicates);
-	}
-	
-	private void fillInPlanTable() {
-		planTable = new PlanTable();
-		
-		findBestIndex();
-		if (fromTables.size() == 1) {
-			planTable.table1Card = tables.get(0).getTableCard(); 
-			
-		} else {
-//			planTable.table1Card = tables.get(0).getTableCard();
-//			planTable.table2Card = tables.get(1).getTableCard();
-		}
-			
-	}
-	
-	private void findBestIndex() {
-		
-		for (Table t : tables) {
-			//get all indexes of table t
-			ArrayList<Index> indexes = t.getIndexes();
-			for (Index index : indexes) {
-				
-			}
-		}
-	}
-	
-	private void transformPredicates() {
-		//In-List transformation
-		for (int i = predicates.size() - 2; i >= 0; i--) {
-			Predicate p = predicates.get(i); 
-			if (p.operation.equals("OR") && !p.inList &&
-				getTableName(p.left).equals(getTableName(predicates.get(i + 1).left)) &&
-				getColumnName(p.left).equals(getColumnName(predicates.get(i + 1).left))) {
-				p.text += " OR " + predicates.get(i+1).text;
-				p.type = 'I';
-				p.values.addAll(predicates.get(i + 1).values);
-				p.description = getTableName(p.left) + "." + getColumnName(p.left) + " IN ( ";
-				for (int j = 0; j < p.values.size() - 1; j++)
-					p.description += p.values.get(j) + " , ";
-				p.description += p.values.get(p.values.size() - 1) + " )";
-				
-				predicates.remove(i+1);
-			}
-		}
-		
-		//Reverse In-List transformation
-		for (Predicate p : predicates) {
-			if (p.getType() == 'I' && p.values.size() == 1) {
-				p.type = 'E';
-				p.description = getTableName(p.left) + "." + getColumnName(p.left) + " = " + p.values.get(0);
-			}
-		}
-		
-		//Transitive Closure Prdicate
-	}
-	
-	private void fillInPredicates() {
-		//fill in predicates
-		for (Predicate p : predicates) {
-			String tableName = getTableName(p.left);
-			String colName = getColumnName(p.left);
-			
-			if (tableName.isEmpty()) {
-				//left is value
-				continue;
-			}
-			
-			Table t = tables.get(tableNames.get(tableName));
-			for (int i = 0; i < t.getColumns().size(); i++) 
-				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
-					Column c = t.getColumns().get(i);
-					p.setCard1(c.getColCard());
-					switch (p.type) {
-					case 'E':
-						p.setFf1(1.0 / p.getCard1());
-						break;
-					case 'I':
-						p.setFf1(1.0 * p.values.size() / p.getCard1());
-						break;
-					case 'r': //left smaller than right
-						p.setFf1(1.0 * (value(p.values.get(0), c.getColType()) - value(c.getLoKey(), c.getColType())) / (value(c.getHiKey(), c.getColType()) - value(c.getLoKey(), c.getColType())));
-						break;
-					case 'R':
-						p.setFf1(1.0 * (value(c.getHiKey(), c.getColType()) - value(p.values.get(0), c.getColType())) / (value(c.getHiKey(), c.getColType()) - value(c.getLoKey(), c.getColType())));
-						break;
-					}
-					break;
-				}
-			
-			if (p.join) {
-				tableName = getTableName(p.right);
-				colName = getColumnName(p.right);
-				
-				t = tables.get(tableNames.get(tableName));
-				for (int i = 0; i < t.getColumns().size(); i++) 
-					if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
-						Column c = t.getColumns().get(i);
-						p.setCard2(c.getColCard());
-						switch (p.type) {
-						case 'E':
-							p.setFf2(1.0 / p.getCard2());
-							break;
-						}
-						break;
-					}
-			}
-		}
-	}
-
-	private String getTableName(String s) {
-		int id = s.indexOf(".");
-		if (id == -1) return "";
-		return s.substring(0, id);
-	}
-	
-	private String getColumnName(String s) {
-		int id = s.indexOf(".");
-		return s.substring(id + 1);
-	}
-	
-	private int value(String v, Column.ColType type) {
-		if (type.equals(Column.ColType.INT))
-			return Integer.parseInt(v);
-		v = v.toUpperCase();
-		return (v.charAt(0) - 'A' + 1) * 26 + (v.charAt(1) - 'A' + 1); 
-	}
-	
-	private boolean checkValidate() {
-		tableNames = new HashMap<String, Integer>();
-		for (int i = 0; i < tables.size(); i++) {
-//			doRunstats(tables.get(i).getTableName());
-			tableNames.put(tables.get(i).getTableName(), i);
-		}
-		
-		for (String c : fromTables) {
-			if (!tableNames.containsKey(c)) {
-				System.out.println("Database does not have table: " + c);
-				return false;
-			} 
-		}
-		
-		for (String c : selectColumns) {
-			String tableName = getTableName(c);
-			String colName = getColumnName(c);
-			
-			if (!tableNames.containsKey(tableName)) {
-				System.out.println("Database does not have table: " + tableName);
-				return false;
-			}
-			if (!fromTables.contains(tableName)) fromTables.add(tableName);
-			int id = tableNames.get(tableName);
-			Table t = tables.get(id);
-			boolean found = false;
-			for (int i = 0; i < t.getColumns().size(); i++) {
-				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				System.out.println("Table " + tableName + " does not have column " + colName);
-				return false;
-			}
-		}
-		
-		for (String c : whereColumns) {
-			String tableName = getTableName(c);
-			String colName = getColumnName(c);
-			
-			if (tableName.isEmpty()) continue; 
-			
-			if (!tableNames.containsKey(tableName)) {
-				System.out.println("Database does not have table: " + tableName);
-				return false;
-			}
-			if (!fromTables.contains(tableName)) fromTables.add(tableName);
-			int id = tableNames.get(tableName);
-			Table t = tables.get(id);
-			boolean found = false;
-			for (int i = 0; i < t.getColumns().size(); i++) {
-				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				System.out.println("Table " + tableName + " does not have column " + colName);
-				return false;
-			}
-		}
-		
-		for (String c : sortColumns) {
-			String tableName = getTableName(c);
-			String colName = getColumnName(c);
-			if (!tableNames.containsKey(tableName)) {
-				System.out.println("Database does not have table: " + tableName);
-				return false;
-			}
-			if (!fromTables.contains(tableName)) fromTables.add(tableName);
-			int id = tableNames.get(tableName);
-			Table t = tables.get(id);
-			boolean found = false;
-			for (int i = 0; i < t.getColumns().size(); i++) {
-				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
-					found = true;
-					break;
-				}
-			}
-			if (!found) {
-				System.out.println("Table " + tableName + " does not have column " + colName);
-				return false;
-			}
-		}
-		
-		return true;
-	}
 	
 	private void createIndex(String sql, StringTokenizer tokenizer, boolean isUnique) throws Exception {
 		try {
@@ -1414,5 +1016,576 @@ public class DBMS {
 			column.setColCard(h.size() - d);
 		}
 		
+	}
+
+	private void select(String sql, StringTokenizer tokenizer) throws Exception {
+		try {
+//			System.out.println("Parsing SELECT statement ... ");
+			selectColumns = new ArrayList<String>();
+			whereColumns = new ArrayList<String>();
+			sortColumns = new ArrayList<String>();
+			fromTables = new ArrayList<String>();
+			predicates = new ArrayList<Predicate>();
+			
+			boolean hasMore = true;
+			String token;
+			while (hasMore) {
+				token = tokenizer.nextToken();
+				int id = token.indexOf(".");
+				if (id == -1) throw new NoSuchElementException();
+				
+				selectColumns.add(token);
+
+				token = tokenizer.nextToken();
+				hasMore = ",".equalsIgnoreCase(token);
+			}
+			
+			//token == "FROM"
+			token = tokenizer.nextToken();
+			hasMore = true;
+			while (hasMore) {
+				fromTables.add(token);
+				token = tokenizer.nextToken();
+				hasMore = ",".equalsIgnoreCase(token);
+				if (hasMore) token = tokenizer.nextToken();
+			}
+			
+//			System.out.println("After FROM");
+			
+			if (token.equalsIgnoreCase("WHERE")) {
+				token = tokenizer.nextToken();
+				
+				hasMore = true;
+				while (hasMore) {
+					while ("(".equals(token)) {
+						token = tokenizer.nextToken();
+					}
+					
+					Predicate p = new Predicate();
+					p.text += token; //Column name
+					
+					p.left = token;
+					whereColumns.add(p.left);
+					
+					token = tokenizer.nextToken(); //condition
+					p.text += " " + token;
+					if (token.equalsIgnoreCase("IN")) {
+						p.setType('I');
+						p.setInList(true);
+						
+						//Parse IN list
+						token = tokenizer.nextToken();
+						if (!"(".equals(token)) throw new NoSuchElementException();
+						p.text += " " + token;
+						
+						hasMore = true;
+						while (hasMore) {
+							token = tokenizer.nextToken();
+							p.values.add(token);
+							p.text += " " + token;
+							
+							token = tokenizer.nextToken();
+							hasMore = ",".equals(token);
+							if (hasMore) p.text += " ,";
+						}
+						
+						if (!")".equals(token)) throw new NoSuchElementException();
+						p.text += " " + token;
+					} else if ("=<>".contains(token)) {
+						if ("=".equalsIgnoreCase(token)) p.setType('E');
+						else if ("<".equals(token)) p.setType('r'); 
+						else p.setType('R');
+						
+						token = tokenizer.nextToken();
+						if (token.contains(".")) { //Join predicate
+							p.setJoin(true);
+							p.right = token;
+							whereColumns.add(p.right);
+							
+							p.text += " " + token;
+						} else {
+							p.setJoin(false);
+							p.values.add(token);
+							
+							p.text += " " + token;
+						}
+						
+						while (")".equals(token)) {
+							token = tokenizer.nextToken();
+						}
+					} else throw new NoSuchElementException(); 
+					
+					token = tokenizer.nextToken();
+					while (")".equals(token)) {
+						token = tokenizer.nextToken();
+					}
+						
+					hasMore = "AND".equalsIgnoreCase(token) || "OR".equalsIgnoreCase(token); 
+					
+					if (hasMore) {
+						p.operation = token;
+						token = tokenizer.nextToken();
+						while ("(".equals(token)) {
+							token = tokenizer.nextToken();
+						}
+					}
+					
+					predicates.add(p);
+				}			
+			} 
+			
+			if (token.equalsIgnoreCase("ORDER")) {
+				token = tokenizer.nextToken();
+				if (!token.equalsIgnoreCase("BY")) throw new NoSuchElementException();
+				
+				hasMore = true;
+				while (hasMore) {
+					token = tokenizer.nextToken();
+					int id = token.indexOf(".");
+					if (id == -1) throw new NoSuchElementException();
+					sortColumns.add(token);
+					
+					token = tokenizer.nextToken(); //Don't care about 'A' or 'D'
+					if (token.equalsIgnoreCase("D") || token.equalsIgnoreCase("A"))
+						token = tokenizer.nextToken();
+					
+					hasMore = ",".equals(token);
+				}
+			}
+			
+			if (! ";".equals(token)) throw new NoSuchElementException();
+			
+			System.out.println("Successfully parsing ...");
+		} catch (NoSuchElementException ex) {
+			throw new DbmsError("Invalid SELECT statement. '" + sql + "'.");			
+		}	
+
+		/*
+		//Print out after parsing
+		System.out.println("SELECT");
+		for (ColumnName c : selectColumns) {
+			System.out.println(c.tableName + "." + c.colName);
+		}
+		
+		System.out.println("FROM");
+		for (String c : fromTables) {
+			System.out.println(c);
+		}
+		
+		System.out.println("WHERE");
+		for (ColumnName c : whereColumns) {
+			System.out.println(c.tableName + "." + c.colName);
+		}
+		
+		System.out.println("ORDER BY");
+		for (ColumnName c : sortColumns) {
+			System.out.println(c.tableName + "." + c.colName);
+		}
+		*/
+		
+		//Evaluate
+		evaluatePlanTable();
+	}
+	
+	private void evaluatePlanTable() {
+		if (!checkValidate()) return;
+		
+		transformPredicates();
+		
+		fillInPredicates();
+		
+		fillInPlanTable();
+		
+		findPredicateSequence();
+		
+		planTable.printTable(out);
+		Predicate.printTable(out, predicates);
+	}
+	
+	private void findPredicateSequence() {
+		for (Predicate p : predicates) {
+			String tableName = getTableName(p.left);
+			
+			if (tableName.isEmpty()) {
+				//left is value
+				p.setSequence(0);
+				if (p.left.equals(p.values.get(0))) {
+					p.setFf1(1);
+					if (p.operation.equals("OR")) {
+						for (Predicate q : predicates)
+							q.setSequence(0);
+						break;
+					}
+				} else {
+					p.setFf1(0);
+					if (p.operation.equals("AND")) {
+						for (Predicate q : predicates)
+							q.setSequence(0);
+						break ;
+					}
+				}
+				continue;
+			}
+		}
+		
+		for (int i = 0; i < predicates.size(); i++)
+			if (predicates.get(i).sequence == -1) {
+				Predicate p = predicates.get(i);
+				for (int j = i + 1; j < predicates.size(); j++)
+					if (predicates.get(j).sequence == -1) {
+						Predicate q = predicates.get(i);
+						if (p.left.equals(q.left)) {
+							String smallValue = "";
+							String bigValue = "";
+							if (p.values.get(0).compareTo(q.values.get(0)) < 0) {
+								smallValue = p.values.get(0);
+								bigValue = q.values.get(0);
+							} else {
+								smallValue = q.values.get(0);
+								bigValue = p.values.get(0);
+							}
+							
+							if (p.type == 'E' && q.type == 'E') {
+								if (!smallValue.equals(bigValue)) {
+									p.setSequence(0);
+									q.setSequence(0);
+									break;
+								}
+							}
+							if (p.type == 'r' && q.type == 'r') {
+								
+							}
+						}
+					}
+			}
+	}
+	
+	private void fillInPlanTable() {
+		planTable = new PlanTable();
+		
+		findBestIndex();
+		if (fromTables.size() == 1) {
+			planTable.table1Card = tables.get(0).getTableCard(); 
+		} else {
+			planTable.table1Card = tables.get(0).getTableCard();
+			planTable.table2Card = tables.get(1).getTableCard();
+			planTable.prefetch = 'S';			
+		}
+	}
+	
+	private void findBestIndex() {
+		int maxSort = 0;
+		int maxMatching = 0;
+		int maxScreening = 0;
+		String maxIndex = "";
+		int maxColumn = 0;
+		double minFF = 1.0;
+		ArrayList<String> maxMatchingColumns = new ArrayList<String>();
+		
+		for (Table t : tables) {
+//			System.out.println("Table: " + t.getTableName());
+			
+			ArrayList<String> colNames = new ArrayList<String>();
+			for (Column c : t.getColumns()) 
+				colNames.add(t.getTableName() + "." + c.getColName());
+			
+			for (Index index : t.getIndexes()) { //Calculate for each index in Database
+				ArrayList<String> colPos = new ArrayList<String>();
+				for (Index.IndexKeyDef def : index.getIdxKey()) {
+					colPos.add(colNames.get(def.colId - 1));
+				}
+				
+				ArrayList<Integer> matchedColumns = new ArrayList<Integer>();
+				
+				int cntSort = 0;
+				int cntMatching = 0;
+				int cntCol = 0;
+				double ff = 1.0;
+				
+				for (int i = 0; i < sortColumns.size(); i++) {
+					String s = sortColumns.get(i);
+					int id = colPos.indexOf(s) + 1;
+					if (id == i + 1) cntSort++;
+					if (id > 0) cntCol++;
+				}
+				
+				for (String s : whereColumns) {
+					int id = colPos.indexOf(s) + 1;
+					matchedColumns.add(id);
+					if (id > 0) cntCol++;
+				}
+				
+				while (matchedColumns.contains(cntMatching + 1)) {
+					cntMatching++;
+				}
+				int cntScreening = matchedColumns.size() - cntMatching;
+				for (int i : matchedColumns)
+					if (i == 0) cntScreening--;
+				
+				for (String s : selectColumns) {
+					int id = colPos.indexOf(s) + 1;
+					if (id > 0) cntCol++;
+				}
+				
+				if (cntSort > maxSort || cntSort == maxSort && cntMatching > maxMatching || 
+					cntSort == maxSort && cntMatching == maxMatching && cntScreening > maxScreening || 
+					cntSort == maxSort && cntMatching == maxMatching && cntScreening == maxScreening && minFF > ff) {
+					maxSort = cntSort;
+					maxMatching = cntMatching;
+					maxScreening = cntScreening;
+					maxColumn = cntCol;
+					minFF = ff;
+					maxIndex = t.getTableName() + index.getIdxName();
+					
+					maxMatchingColumns = new ArrayList<String>();
+					for (int i = 1; i <= maxMatching; i++) {
+						int id = matchedColumns.indexOf(i);
+						maxMatchingColumns.add(whereColumns.get(id));
+					}
+				}
+				
+				System.out.println("Index: " + t.getTableName() + index.getIdxName());
+				for (String s : colPos) {
+					System.out.print(s + ", ");
+				}
+				System.out.println();
+				
+				System.out.println("++++");
+				for (int i : matchedColumns) {
+					System.out.println(i);
+				}
+			}
+		}
+		
+		planTable.matchCols = maxSort + maxMatching;
+		if (maxIndex.equals("")) {
+			planTable.accessType = 'R';
+			planTable.prefetch = 'S';
+			if (sortColumns.size() > 0) {
+				planTable.sortC_orderBy = 'Y';
+			}
+		} else {
+			boolean inListIndex = false;
+			for (Predicate p : predicates)
+				if (p.inList) 
+					if (maxMatchingColumns.contains(p.left)) {
+						inListIndex = true;
+						break;
+					}
+			
+			planTable.accessType = inListIndex ? 'N' : 'I';
+			
+			if (maxSort != sortColumns.size()) {
+				planTable.sortC_orderBy = 'Y';
+			}
+			if (maxColumn == sortColumns.size() + whereColumns.size() + selectColumns.size()) {
+				planTable.indexOnly = 'Y';
+			}
+				
+		}
+		planTable.accessName = maxIndex;
+			
+	}
+	
+	private void transformPredicates() {
+		if (predicates.size() == 1) 
+			predicates.get(0).operation = "AND";
+		else
+			predicates.get(predicates.size() - 1).operation = predicates.get(predicates.size() - 2).operation;
+		
+		//In-List transformation
+		for (int i = predicates.size() - 2; i >= 0; i--) {
+			Predicate p = predicates.get(i); 
+			if (p.operation.equals("OR") && p.type == 'E' &&
+				getTableName(p.left).equals(getTableName(predicates.get(i + 1).left)) &&
+				getColumnName(p.left).equals(getColumnName(predicates.get(i + 1).left))) {
+				p.text += " OR " + predicates.get(i+1).text;
+				p.type = 'I';
+				p.setInList(true);
+				p.values.addAll(predicates.get(i + 1).values);
+				p.description = getTableName(p.left) + "." + getColumnName(p.left) + " IN ( ";
+				for (int j = 0; j < p.values.size() - 1; j++)
+					p.description += p.values.get(j) + " , ";
+				p.description += p.values.get(p.values.size() - 1) + " )";
+				
+				predicates.remove(i+1);
+			}
+		}
+		
+		//Reverse In-List transformation
+		for (Predicate p : predicates) {
+			if (p.getType() == 'I' && p.values.size() == 1) {
+				p.type = 'E';
+				p.setInList(false);
+				p.description = getTableName(p.left) + "." + getColumnName(p.left) + " = " + p.values.get(0);
+			}
+		}
+		
+		//Transitive Closure Predicate
+		
+		
+		
+	}
+	
+	private void fillInPredicates() {
+		//fill in predicates
+		for (Predicate p : predicates) {
+			String tableName = getTableName(p.left);
+			String colName = getColumnName(p.left);
+			
+			if (tableName.isEmpty()) {
+				//left is value
+				continue;
+			}
+			
+			Table t = tables.get(tableNames.get(tableName));
+			for (int i = 0; i < t.getColumns().size(); i++) 
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+					Column c = t.getColumns().get(i);
+					p.setCard1(c.getColCard());
+					switch (p.type) {
+					case 'E':
+						p.setFf1(1.0 / p.getCard1());
+						break;
+					case 'I':
+						p.setFf1(1.0 * p.values.size() / p.getCard1());
+						break;
+					case 'r': //left smaller than right
+						p.setFf1(1.0 * (value(p.values.get(0), c.getColType()) - value(c.getLoKey(), c.getColType())) / (value(c.getHiKey(), c.getColType()) - value(c.getLoKey(), c.getColType())));
+						break;
+					case 'R':
+						p.setFf1(1.0 * (value(c.getHiKey(), c.getColType()) - value(p.values.get(0), c.getColType())) / (value(c.getHiKey(), c.getColType()) - value(c.getLoKey(), c.getColType())));
+						break;
+					}
+					break;
+				}
+			
+			if (p.join) {
+				tableName = getTableName(p.right);
+				colName = getColumnName(p.right);
+				
+				t = tables.get(tableNames.get(tableName));
+				for (int i = 0; i < t.getColumns().size(); i++) 
+					if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+						Column c = t.getColumns().get(i);
+						p.setCard2(c.getColCard());
+						switch (p.type) {
+						case 'E':
+							p.setFf2(1.0 / p.getCard2());
+							break;
+						}
+						break;
+					}
+			}
+		}
+	}
+
+	private String getTableName(String s) {
+		int id = s.indexOf(".");
+		if (id == -1) return "";
+		return s.substring(0, id);
+	}
+	
+	private String getColumnName(String s) {
+		int id = s.indexOf(".");
+		if (id == -1) return "";
+		return s.substring(id + 1);
+	}
+	
+	private int value(String v, Column.ColType type) {
+		if (type.equals(Column.ColType.INT))
+			return Integer.parseInt(v);
+		v = v.toUpperCase();
+		return (v.charAt(0) - 'A' + 1) * 26 + (v.charAt(1) - 'A' + 1); 
+	}
+	
+	private boolean checkValidate() {
+		tableNames = new HashMap<String, Integer>();
+		for (int i = 0; i < tables.size(); i++) {
+//			doRunstats(tables.get(i).getTableName());
+			tableNames.put(tables.get(i).getTableName(), i);
+		}
+		
+		for (String c : fromTables) {
+			if (!tableNames.containsKey(c)) {
+				System.out.println("Database does not have table: " + c);
+				return false;
+			} 
+		}
+		
+		for (String c : selectColumns) {
+			String tableName = getTableName(c);
+			String colName = getColumnName(c);
+			
+			if (!tableNames.containsKey(tableName)) {
+				System.out.println("Database does not have table: " + tableName);
+				return false;
+			}
+			if (!fromTables.contains(tableName)) fromTables.add(tableName);
+			int id = tableNames.get(tableName);
+			Table t = tables.get(id);
+			boolean found = false;
+			for (int i = 0; i < t.getColumns().size(); i++) {
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				System.out.println("Table " + tableName + " does not have column " + colName);
+				return false;
+			}
+		}
+		
+		for (String c : whereColumns) {
+			String tableName = getTableName(c);
+			String colName = getColumnName(c);
+			
+			if (tableName.isEmpty()) continue; 
+			
+			if (!tableNames.containsKey(tableName)) {
+				System.out.println("Database does not have table: " + tableName);
+				return false;
+			}
+			if (!fromTables.contains(tableName)) fromTables.add(tableName);
+			int id = tableNames.get(tableName);
+			Table t = tables.get(id);
+			boolean found = false;
+			for (int i = 0; i < t.getColumns().size(); i++) {
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				System.out.println("Table " + tableName + " does not have column " + colName);
+				return false;
+			}
+		}
+		
+		for (String c : sortColumns) {
+			String tableName = getTableName(c);
+			String colName = getColumnName(c);
+			if (!tableNames.containsKey(tableName)) {
+				System.out.println("Database does not have table: " + tableName);
+				return false;
+			}
+			if (!fromTables.contains(tableName)) fromTables.add(tableName);
+			int id = tableNames.get(tableName);
+			Table t = tables.get(id);
+			boolean found = false;
+			for (int i = 0; i < t.getColumns().size(); i++) {
+				if (t.getColumns().get(i).getColName().equalsIgnoreCase(colName)) {
+					found = true;
+					break;
+				}
+			}
+			if (!found) {
+				System.out.println("Table " + tableName + " does not have column " + colName);
+				return false;
+			}
+		}
+		
+		return true;
 	}
 }

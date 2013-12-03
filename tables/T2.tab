@@ -4,10 +4,9 @@ C2 I false
 C3 I false
 C4 I true
 C5 I true
-3
-X1 false 3A 
-X2 false 1A 2A 
-X3 false 2A 3A 
+2
+X1 false 1A 2A 
+X2 false 2A 3A 
 0
 STATS TABCARD 50
 STATS COLCARD 0 50 50 1

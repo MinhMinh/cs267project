@@ -21,7 +21,7 @@ public class Predicate {
 	public double ff1; // left column filter factor
 	public double ff2; // right column filter factor
 
-	public int sequence; // order of predicate evaluation
+	public int sequence = -1; // order of predicate evaluation
 
 	public String text = ""; // original text
 	public String description = ""; // description for added predicates and
